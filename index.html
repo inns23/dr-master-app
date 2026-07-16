@@ -77,6 +77,27 @@
   @media (min-width:540px){ body{ padding:24px 16px; } .app{ height:min(860px,96vh); max-height:min(860px,96vh);
     border-radius:22px; overflow:hidden; box-shadow:0 8px 30px rgba(20,20,20,0.12); } }
 
+  /* ---------- FIRST-RUN ONBOARDING ---------- */
+  .onboarding-overlay { position:absolute; inset:0; z-index:500; background:var(--bg);
+    display:flex; flex-direction:column; }
+  .onboarding-overlay.hidden { display:none; }
+  .ob-skip-row { display:flex; justify-content:flex-end; padding:calc(14px + env(safe-area-inset-top)) 18px 0; flex:none; }
+  .ob-skip { border:none; background:none; color:var(--muted); font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; padding:6px; }
+  .ob-slides { flex:1; position:relative; overflow:hidden; min-height:0; }
+  .ob-slide { position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:20px 34px; }
+  .ob-slide.active { display:flex; }
+  .ob-logo { font-size:32px; font-weight:800; margin-bottom:20px; }
+  .ob-logo .hl-b { color:var(--ink); } .ob-logo .hl-red { color:var(--red); }
+  .ob-icon { width:170px; height:170px; object-fit:contain; margin-bottom:22px; }
+  .ob-slide h2 { font-size:20px; font-weight:800; color:var(--ink); margin:0 0 12px; line-height:1.3; }
+  .ob-slide p { font-size:13.5px; color:var(--muted); line-height:1.6; max-width:300px; margin:0; }
+  .ob-dots { display:flex; justify-content:center; gap:8px; padding:14px 0; flex:none; }
+  .ob-dots .ob-dot { width:7px; height:7px; border-radius:50%; background:var(--line); transition:background 0.2s, width 0.2s; }
+  .ob-dots .ob-dot.active { background:var(--red); width:20px; border-radius:100px; }
+  .ob-actions { padding:0 24px calc(20px + env(safe-area-inset-bottom)); flex:none; }
+  .ob-actions .btn { width:100%; }
+
   main#tab-content { flex:1; min-height:0; overflow-y:auto; overscroll-behavior-y:contain;
     padding-top:env(safe-area-inset-top); padding-bottom:calc(84px + env(safe-area-inset-bottom));
     -webkit-overflow-scrolling:touch; }
@@ -533,6 +554,28 @@
   .compare-cost-box .cc-label { font-size:11.5px; color:var(--muted); font-weight:700; }
   .compare-cost-box .cc-value { font-size:22px; font-weight:800; color:var(--red); margin-top:5px; }
   .compare-detail-rows .mkd-info-row { padding:9px 0; }
+  .compare-hero-card { background:linear-gradient(135deg,var(--card) 50%,var(--red-tint)); border:1px solid #f3d3d4; border-radius:var(--radius-lg);
+    padding:20px 16px; text-align:center; margin-bottom:14px; }
+  .compare-hero-card .ch-label { font-size:12px; color:var(--muted); font-weight:700; }
+  .compare-hero-card .ch-value { font-size:30px; font-weight:800; color:var(--red); margin:6px 0; }
+  .compare-hero-card .ch-sub { font-size:11.5px; color:var(--muted); line-height:1.5; }
+  .card-title { font-size:13px; font-weight:800; color:var(--ink); margin-bottom:12px; }
+  .compare-bars-card .compare-bar-row { margin-bottom:14px; }
+  .compare-bars-card .compare-bar-row:last-child { margin-bottom:0; }
+  .compare-bars-card .cbr-toprow { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
+  .compare-bars-card .cbr-label { font-size:11.5px; font-weight:700; color:var(--ink); }
+  .compare-bars-card .cbr-value { font-size:13.5px; font-weight:800; color:var(--ink); }
+  .compare-bars-card .cbr-track { height:14px; border-radius:100px; background:var(--squircle-bg); overflow:hidden; }
+  .compare-bars-card .cbr-fill { height:100%; border-radius:100px; transition:width 0.5s ease; }
+  .compare-bars-card .cbr-fill.dr { background:var(--red); }
+  .compare-bars-card .cbr-fill.os { background:#9aa4b5; }
+  .compare-breakdown-card .cbd-row { display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--line); }
+  .compare-breakdown-card .cbd-row:last-child { border-bottom:none; padding-bottom:0; }
+  .compare-breakdown-card .cbd-row:first-child { padding-top:0; }
+  .compare-breakdown-card .cbd-icon { width:32px; height:32px; border-radius:10px; background:var(--red-tint); color:var(--red); flex:none;
+    display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800; }
+  .compare-breakdown-card .cbd-title { font-size:12.5px; font-weight:800; color:var(--ink); margin-bottom:3px; }
+  .compare-breakdown-card .cbd-sub { font-size:11.5px; color:var(--muted); line-height:1.5; }
 
   /* ---------- MILESTONE BANNER / PROGRESS BAR ---------- */
   .milestone-banner { background:linear-gradient(135deg,#16233f,#2a4d8f 65%,#3f6fc4); border-radius:var(--radius-lg); color:#fff;
@@ -543,7 +586,7 @@
   .milestone-banner .mb-body { font-size:11.5px; color:#cfdcf3; line-height:1.5; margin-bottom:12px; max-width:90%; }
   .milestone-banner .mb-cta { display:inline-block; background:#fff; color:#16233f; font-size:12px; font-weight:800; padding:9px 14px;
     border-radius:100px; text-decoration:none; }
-  .unlock-progress { background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:13px 15px; margin-bottom:14px; }
+  .unlock-progress { background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:13px 15px; margin-bottom:14px; cursor:pointer; }
   .unlock-progress .up-row { display:flex; justify-content:space-between; font-size:11.5px; font-weight:700; color:var(--ink); margin-bottom:7px; }
   .unlock-progress .up-row .up-muted { color:var(--muted); font-weight:600; }
   .unlock-progress .up-track { height:7px; border-radius:100px; background:var(--squircle-bg); overflow:hidden; }
@@ -551,6 +594,17 @@
   .unlock-progress .goal-actions { display:flex; gap:14px; margin-top:9px; }
   .unlock-progress .goal-actions button { background:none; border:none; font-size:11px; font-weight:700; color:var(--muted); cursor:pointer; font-family:inherit; text-decoration:underline; padding:0; }
   .btn-set-goal { width:100%; }
+
+  /* ---------- DR GLOBAL INDEX PAGE ---------- */
+  .dgi-hero { background:linear-gradient(135deg,#16233f,#2a4d8f 65%,#3f6fc4); border-radius:var(--radius-lg); color:#fff;
+    padding:22px 18px; margin-bottom:16px; text-align:center; }
+  .dgi-hero .dgi-icon { width:64px; height:64px; object-fit:contain; margin:0 auto 8px; display:block; }
+  .dgi-hero .dgi-eyebrow { font-size:10.5px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; opacity:0.8; margin-bottom:6px; }
+  .dgi-hero .dgi-value-row { font-size:13px; font-weight:700; margin-bottom:10px; }
+  .dgi-hero .dgi-track { height:14px; border-radius:100px; background:rgba(255,255,255,0.18); overflow:hidden; margin-bottom:8px; }
+  .dgi-hero .dgi-fill { height:100%; background:#fff; border-radius:100px; transition:width 0.5s ease; }
+  .dgi-hero .dgi-pct-label { font-size:12px; font-weight:700; color:#cfdcf3; }
+  .dgi-section-title { font-size:14px; font-weight:800; color:var(--ink); margin:4px 0 10px; }
 
   /* ---------- BUILD YOUR OWN ---------- */
   .byo-pick-row { display:flex; align-items:center; gap:11px; padding:10px 0; border-bottom:1px solid var(--line); cursor:pointer; }
@@ -579,6 +633,35 @@
 </head>
 <body>
 <div class="app" id="app">
+  <div class="onboarding-overlay hidden" id="onboardingOverlay">
+    <div class="ob-skip-row"><button class="ob-skip" id="btnSkipOnboarding" data-t="obSkip">Skip</button></div>
+    <div class="ob-slides" id="obSlides">
+      <div class="ob-slide" data-slide="0">
+        <div class="ob-logo"><span class="hl-b">DR</span> <span class="hl-red">MASTER</span></div>
+        <h2 data-t="obSlide1Title">Own the world, in baht</h2>
+        <p data-t="obSlide1Body">Apple, NVIDIA, Tencent and more — settled, converted, and custodied inside your own Bualuang account. No separate overseas brokerage needed.</p>
+      </div>
+      <div class="ob-slide" data-slide="1">
+        <img class="ob-icon" src="assets/mascots/mascot_persona_index.png" alt="" />
+        <h2 data-t="obSlide2Title">50 global names, live in the app</h2>
+        <p data-t="obSlide2Body">Browse and trade 50 Bualuang DR01s with live bid/ask pricing, all in Thai baht — buy your first one in under a minute.</p>
+      </div>
+      <div class="ob-slide" data-slide="2">
+        <img class="ob-icon" src="assets/mascots/mascot_gift.png" alt="" />
+        <h2 data-t="obSlide3Title">Track your progress, your way</h2>
+        <p data-t="obSlide3Body">Set savings goals, watch your portfolio grow, and unlock your own Wealth Wrapped — your investor persona, top holdings, and more.</p>
+      </div>
+      <div class="ob-slide" data-slide="3">
+        <img class="ob-icon" src="assets/mascots/mascot_milestone.png" alt="" />
+        <h2 data-t="obSlide4Title">Not sure where to start?</h2>
+        <p data-t="obSlide4Body">Answer a few quick questions and Planner builds you a backtested, goal-based portfolio — ready to compare in minutes.</p>
+      </div>
+    </div>
+    <div class="ob-dots" id="obDots"></div>
+    <div class="ob-actions">
+      <button class="btn primary" id="obNextBtn" data-t="obNextBtn">Next</button>
+    </div>
+  </div>
   <main id="tab-content">
 
     <!-- ============ HOME ============ -->
@@ -1284,21 +1367,71 @@
       </div>
 
       <div id="compareNumericWrap">
-        <div class="card">
-          <div class="tf-strip" id="compareTfStrip"></div>
-          <div class="compare-legend-row">
-            <span class="cl-item"><span class="cl-sq" style="background:#C8232A;"></span><span data-t="portCompareDrLabel">Through Bualuang DR</span></span>
-            <span class="cl-item"><span class="cl-sq" style="background:#9aa4b5;"></span><span data-t="portCompareOverseasLabel">Direct overseas investing</span></span>
+        <div class="tf-strip" id="compareTfStrip"></div>
+
+        <div class="compare-hero-card">
+          <div class="ch-label" id="compareHeroLabel" data-t="compareHeroLabel">You saved</div>
+          <div class="ch-value" id="compareHeroValue">–</div>
+          <div class="ch-sub" data-t="compareHeroSub">investing through Bualuang DR instead of directly overseas</div>
+        </div>
+
+        <div class="card compare-bars-card">
+          <div class="card-title" id="compareBarsTitle" data-t="compareBarsTitle">Portfolio value after {years}</div>
+          <div class="compare-bar-row">
+            <div class="cbr-toprow"><span class="cbr-label" data-t="portCompareDrLabel">Through Bualuang DR</span><span class="cbr-value" id="compareBarDrValue">–</span></div>
+            <div class="cbr-track"><div class="cbr-fill dr" id="compareBarDr" style="width:0%;"></div></div>
           </div>
+          <div class="compare-bar-row">
+            <div class="cbr-toprow"><span class="cbr-label" data-t="portCompareOverseasLabel">Direct overseas investing</span><span class="cbr-value" id="compareBarOsValue">–</span></div>
+            <div class="cbr-track"><div class="cbr-fill os" id="compareBarOs" style="width:0%;"></div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" data-t="compareGapTitle">Your savings add up over time</div>
           <div class="chart-wrap tall"><canvas id="compareChart"></canvas></div>
         </div>
-        <div class="compare-cost-box">
-          <div class="cc-label" id="compareCostLabel" data-t="portCompareCostLabel">Estimated cost of currency conversion &amp; withholding tax</div>
-          <div class="cc-value" id="compareCostValue">–</div>
+
+        <div class="card compare-breakdown-card">
+          <div class="card-title" data-t="compareBreakdownTitle">Where the savings come from</div>
+          <div class="cbd-row">
+            <div class="cbd-icon">1</div>
+            <div class="cbd-mid"><div class="cbd-title" data-t="compareBreakdownFxTitle">One-time FX conversion cost avoided</div>
+              <div class="cbd-sub" id="compareBreakdownFxSub"></div></div>
+          </div>
+          <div class="cbd-row">
+            <div class="cbd-icon">2</div>
+            <div class="cbd-mid"><div class="cbd-title" data-t="compareBreakdownTaxTitle">Ongoing withholding tax avoided</div>
+              <div class="cbd-sub" id="compareBreakdownTaxSub"></div></div>
+          </div>
         </div>
-        <div class="card compare-detail-rows" id="compareDetailRows"></div>
       </div>
       <p class="disclaimer" data-t="portCompareDisclaimer"></p>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay-dr-global-index">
+    <div class="overlay-header">
+      <button class="overlay-close" id="btnCloseDrGlobalIndex">‹</button>
+      <h1 data-t="dgiTitle">DR Global Index</h1>
+      <div style="width:30px;"></div>
+    </div>
+    <div class="overlay-body">
+      <div class="dgi-hero">
+        <img class="dgi-icon" src="assets/mascots/mascot_milestone.png" alt="" />
+        <div class="dgi-eyebrow" data-t="dgiEyebrow">Auto Investing</div>
+        <div class="dgi-value-row" id="dgiValueRow">–</div>
+        <div class="dgi-track"><div class="dgi-fill" id="dgiFill" style="width:0%;"></div></div>
+        <div class="dgi-pct-label" id="dgiPctLabel">0%</div>
+      </div>
+
+      <p class="hint" data-t="dgiIntro" style="margin-bottom:16px;"></p>
+
+      <div class="dgi-section-title" data-t="dgiBenefitsTitle">Why DR Global Index</div>
+      <div id="dgiBenefitsList"></div>
+
+      <a class="btn primary" style="display:block; text-align:center; text-decoration:none; margin-top:6px;"
+        href="https://www.bualuang.co.th/article/drglobalindex" target="_blank" rel="noopener" data-t="milestoneCta">View DR Global Index fact sheet</a>
     </div>
   </div>
 
@@ -1537,6 +1670,15 @@ const NEWS_DATA = [{"ticker":"NVDA","title":"Bank of America sees Nvidia's next 
 const STRINGS = {
   en: {
     navHome:"Home", navMarkets:"Markets", navPortfolio:"Portfolio", navPlanner:"Planner", navNews:"News",
+    obSkip:"Skip", obNextBtn:"Next", obGetStartedBtn:"Build my portfolio",
+    obSlide1Title:"Own the world, in baht",
+    obSlide1Body:"Apple, NVIDIA, Tencent and more — settled, converted, and custodied inside your own Bualuang account. No separate overseas brokerage needed.",
+    obSlide2Title:"50 global names, live in the app",
+    obSlide2Body:"Browse and trade 50 Bualuang DR01s with live bid/ask pricing, all in Thai baht — buy your first one in under a minute.",
+    obSlide3Title:"Track your progress, your way",
+    obSlide3Body:"Set savings goals, watch your portfolio grow, and unlock your own Wealth Wrapped — your investor persona, top holdings, and more.",
+    obSlide4Title:"Not sure where to start?",
+    obSlide4Body:"Answer a few quick questions and Planner builds you a backtested, goal-based portfolio — ready to compare in minutes.",
     homeMarketsTitle:"Markets", homeTopPicksTitle:"Top Picks", homeFavTitle:"Favorites", homeNewsTitle:"News",
     bannerSub:"Own the world's biggest companies through Bualuang DR — settled, converted, and custodied inside your own account.",
     seeAllLabel:"See all", favEmptyHint:"Star DRs in Markets to add them here",
@@ -1732,6 +1874,27 @@ const STRINGS = {
     portCompareDisclaimer:"Illustrative comparison using the same simulated price paths for both sides, with a 1.5% one-time FX conversion cost and a 0.5%/year withholding tax drag applied to the direct-overseas series. Actual costs vary by broker, country, and holding period — not investment advice.",
     compareFxRateLabel:"Current exchange rate", compareFxCostLabel:"One-time FX conversion cost", compareTaxDragLabel:"Ongoing foreign withholding tax",
     compareTimeframeLabel:"Timeframe",
+    compareHeroLabel:"You saved",
+    compareHeroSub:"investing through Bualuang DR instead of directly overseas",
+    compareBarsTitle:"Portfolio value after {years}",
+    compareGapTitle:"Your savings add up over time",
+    compareGapSeriesLabel:"Your accumulated savings",
+    compareBreakdownTitle:"Where the savings come from",
+    compareBreakdownFxTitle:"One-time FX conversion cost avoided",
+    compareBreakdownFxSub:"Direct overseas investing typically costs about 1.5% in one-time currency conversion fees at today's {rate} rate. Bualuang DR settles and converts for you, so this cost never applies.",
+    compareBreakdownTaxTitle:"Ongoing withholding tax avoided",
+    compareBreakdownTaxSub:"Direct overseas holdings are typically subject to about 0.5% per year in foreign withholding tax drag. Bualuang DR avoids this ongoing cost entirely, so more of your return compounds over time.",
+    dgiTitle:"DR Global Index",
+    dgiEyebrow:"Auto Investing",
+    dgiIntro:"DR Global Index is Bualuang's automated, professionally managed index solution — unlocked once your Actual portfolio reaches ฿500,000.",
+    dgiBenefitsTitle:"Why DR Global Index",
+    dgiBenefits:[
+      { title:"Fully automated rebalancing", body:"DR Global Index adjusts your holdings on a set schedule, so your portfolio stays aligned with the global index automatically — no manual trading required." },
+      { title:"Broad global diversification", body:"One allocation spans dozens of the world's largest companies across every major sector, instead of you picking individual names yourself." },
+      { title:"Lower effort, lower emotion", body:"Built to be held for the long term. Skipping day-to-day decisions reduces the temptation to chase headlines or time the market." },
+      { title:"Backed by Bualuang", body:"Managed with BLS's research and portfolio management expertise, using the same DR structure — settled, converted, and custodied inside your existing account." },
+      { title:"Unlocked once, yours going forward", body:"Once your Actual portfolio reaches ฿500,000, DR Global Index stays available to you — no need to requalify." }
+    ],
     portNewsTitle:"News on your holdings", simManualTitle:"Positions you've added",
     portBuildOwnTitle:"Build your own portfolio", portBuildOwnHint:"Pick the DRs you want, then set weights (or leave equal). This becomes your Simulated portfolio.",
     portBuildOwnSelectedTitle:"Selected", portBuildOwnConfirm:"Save as my simulated portfolio", portBuildOwnSearchPlaceholder:"Search by symbol or company",
@@ -1809,6 +1972,15 @@ const STRINGS = {
   },
   th: {
     navHome:"หน้าแรก", navMarkets:"ตลาด", navPortfolio:"พอร์ต", navPlanner:"แผนการลงทุน", navNews:"ข่าว",
+    obSkip:"ข้าม", obNextBtn:"ถัดไป", obGetStartedBtn:"สร้างพอร์ตของฉัน",
+    obSlide1Title:"เป็นเจ้าของโลก ในสกุลเงินบาท",
+    obSlide1Body:"Apple, NVIDIA, Tencent และอีกมากมาย — ชำระราคา แปลงค่าเงิน และรับฝากหลักทรัพย์ในบัญชี Bualuang ของคุณเอง ไม่ต้องเปิดบัญชีต่างประเทศแยก",
+    obSlide2Title:"DR01 ทั่วโลก 50 ตัว พร้อมใช้งานในแอป",
+    obSlide2Body:"สำรวจและซื้อขาย Bualuang DR01 ทั้ง 50 ตัว พร้อมราคาเสนอซื้อ/ขายแบบเรียลไทม์ เป็นสกุลเงินบาททั้งหมด — ซื้อตัวแรกได้ภายในไม่ถึงนาที",
+    obSlide3Title:"ติดตามความคืบหน้าในแบบของคุณ",
+    obSlide3Body:"ตั้งเป้าหมายการออม ดูพอร์ตของคุณเติบโต และปลดล็อก Wealth Wrapped ของคุณเอง — สไตล์นักลงทุน หลักทรัพย์อันดับต้น และอื่นๆ",
+    obSlide4Title:"ยังไม่รู้จะเริ่มจากตรงไหน?",
+    obSlide4Body:"ตอบคำถามสั้นๆ ไม่กี่ข้อ แล้วแผนการลงทุนจะสร้างพอร์ตที่ผ่านการทดสอบย้อนหลังและอิงเป้าหมายให้คุณ พร้อมเปรียบเทียบได้ภายในไม่กี่นาที",
     homeMarketsTitle:"ภาวะตลาด", homeTopPicksTitle:"หุ้นแนะนำ", homeFavTitle:"รายการโปรด", homeNewsTitle:"ข่าว",
     bannerSub:"เป็นเจ้าของบริษัทที่ใหญ่ที่สุดในโลกผ่าน Bualuang DR — ชำระราคา แปลงค่าเงิน และรับฝากหลักทรัพย์ในบัญชีของคุณเอง",
     seeAllLabel:"ดูทั้งหมด", favEmptyHint:"กดดาวที่ DR ในหน้าตลาดเพื่อเพิ่มมาที่นี่",
@@ -2004,6 +2176,27 @@ const STRINGS = {
     portCompareDisclaimer:"การเปรียบเทียบเชิงภาพประกอบ ใช้เส้นทางราคาจำลองเดียวกันทั้งสองฝั่ง โดยฝั่งลงทุนต่างประเทศโดยตรงมีต้นทุนแปลงค่าเงินครั้งเดียว 1.5% และภาษีหัก ณ ที่จ่าย 0.5% ต่อปี ต้นทุนจริงแตกต่างกันตามโบรกเกอร์ ประเทศ และระยะเวลาถือครอง ไม่ใช่คำแนะนำการลงทุน",
     compareFxRateLabel:"อัตราแลกเปลี่ยนปัจจุบัน", compareFxCostLabel:"ต้นทุนแปลงค่าเงินครั้งเดียว", compareTaxDragLabel:"ภาษีหัก ณ ที่จ่ายต่อเนื่อง",
     compareTimeframeLabel:"ช่วงเวลา",
+    compareHeroLabel:"คุณประหยัดไปแล้ว",
+    compareHeroSub:"จากการลงทุนผ่าน Bualuang DR แทนการลงทุนต่างประเทศโดยตรง",
+    compareBarsTitle:"มูลค่าพอร์ตหลังผ่านไป {years}",
+    compareGapTitle:"เงินที่ประหยัดได้เพิ่มขึ้นเรื่อยๆ ตามเวลา",
+    compareGapSeriesLabel:"เงินสะสมที่คุณประหยัดได้",
+    compareBreakdownTitle:"เงินที่ประหยัดมาจากไหน",
+    compareBreakdownFxTitle:"ต้นทุนแปลงค่าเงินครั้งเดียวที่ประหยัดได้",
+    compareBreakdownFxSub:"การลงทุนต่างประเทศโดยตรงมักมีต้นทุนแปลงค่าเงินครั้งเดียวประมาณ 1.5% ที่อัตราแลกเปลี่ยนปัจจุบัน {rate} ในขณะที่ Bualuang DR ชำระราคาและแปลงค่าเงินให้คุณ จึงไม่มีต้นทุนนี้เลย",
+    compareBreakdownTaxTitle:"ภาษีหัก ณ ที่จ่ายต่อเนื่องที่ประหยัดได้",
+    compareBreakdownTaxSub:"การถือครองหลักทรัพย์ต่างประเทศโดยตรงมักถูกหักภาษี ณ ที่จ่ายต่อเนื่องประมาณ 0.5% ต่อปี ส่วน Bualuang DR ไม่มีต้นทุนนี้เลย ทำให้ผลตอบแทนของคุณทบต้นได้เต็มเม็ดเต็มหน่วยมากขึ้นตามเวลา",
+    dgiTitle:"DR Global Index",
+    dgiEyebrow:"Auto Investing",
+    dgiIntro:"DR Global Index คือโซลูชันดัชนีอัตโนมัติที่บริหารโดยมืออาชีพจากบัวหลวง — ปลดล็อกเมื่อพอร์ตจริงของคุณถึง ฿500,000",
+    dgiBenefitsTitle:"ทำไมต้อง DR Global Index",
+    dgiBenefits:[
+      { title:"ปรับสมดุลพอร์ตอัตโนมัติเต็มรูปแบบ", body:"DR Global Index จะปรับสัดส่วนหลักทรัพย์ในพอร์ตของคุณตามรอบที่กำหนดโดยอัตโนมัติ พอร์ตของคุณจึงสอดคล้องกับดัชนีโลกอยู่เสมอ โดยไม่ต้องซื้อขายเอง" },
+      { title:"กระจายการลงทุนทั่วโลกอย่างกว้างขวาง", body:"เพียงหนึ่งพอร์ตครอบคลุมบริษัทชั้นนำระดับโลกนับสิบแห่งในทุกกลุ่มธุรกิจหลัก แทนที่คุณจะต้องเลือกหุ้นรายตัวเอง" },
+      { title:"ใช้แรงน้อยลง ใช้อารมณ์น้อยลง", body:"ออกแบบมาเพื่อการถือครองระยะยาว การไม่ต้องตัดสินใจรายวันช่วยลดโอกาสที่คุณจะไล่ตามกระแสข่าวหรือจับจังหวะตลาด" },
+      { title:"ได้รับการสนับสนุนจากบัวหลวง", body:"บริหารด้วยความเชี่ยวชาญด้านงานวิจัยและการจัดพอร์ตของ BLS ผ่านโครงสร้าง DR เดียวกัน — ชำระราคา แปลงค่าเงิน และรับฝากหลักทรัพย์ในบัญชีที่คุณมีอยู่แล้ว" },
+      { title:"ปลดล็อกครั้งเดียว ใช้ได้ต่อเนื่อง", body:"เมื่อพอร์ตจริงของคุณถึง ฿500,000 แล้ว DR Global Index จะพร้อมใช้งานสำหรับคุณตลอดไป ไม่ต้องปลดล็อกใหม่" }
+    ],
     portNewsTitle:"ข่าวเกี่ยวกับ DR ที่คุณถืออยู่", simManualTitle:"รายการที่คุณเพิ่มเอง",
     portBuildOwnTitle:"สร้างพอร์ตของคุณเอง", portBuildOwnHint:"เลือก DR ที่ต้องการ แล้วกำหนดน้ำหนัก (หรือปล่อยให้เท่ากัน) จะกลายเป็นพอร์ตจำลองของคุณ",
     portBuildOwnSelectedTitle:"รายการที่เลือก", portBuildOwnConfirm:"บันทึกเป็นพอร์ตจำลองของฉัน", portBuildOwnSearchPlaceholder:"ค้นหาด้วยสัญลักษณ์หรือชื่อบริษัท",
@@ -2927,6 +3120,55 @@ function wireBottomNav(){
 }
 function openOverlay(id){ $('#'+id).classList.add('open'); }
 function closeOverlay(id){ $('#'+id).classList.remove('open'); }
+
+/* ---------------------------------------------------------------- */
+/* FIRST-RUN ONBOARDING                                              */
+/* ---------------------------------------------------------------- */
+const ONBOARDING_STORAGE_KEY = 'drmaster_onboarding_seen';
+const ONBOARDING_SLIDE_COUNT = 4;
+let obIndex = 0;
+function markOnboardingSeen(){
+  try { window.localStorage.setItem(ONBOARDING_STORAGE_KEY, '1'); } catch(err){}
+}
+function hasSeenOnboarding(){
+  try { return window.localStorage.getItem(ONBOARDING_STORAGE_KEY) === '1'; } catch(err){ return false; }
+}
+function renderOnboardingStep(){
+  $all('.ob-slide').forEach((el)=> el.classList.toggle('active', Number(el.dataset.slide)===obIndex));
+  const dotsWrap = $('#obDots'); dotsWrap.innerHTML = '';
+  for (let i=0;i<ONBOARDING_SLIDE_COUNT;i++){
+    const d = document.createElement('span');
+    d.className = 'ob-dot' + (i===obIndex ? ' active' : '');
+    dotsWrap.appendChild(d);
+  }
+  const isLast = obIndex === ONBOARDING_SLIDE_COUNT-1;
+  $('#obNextBtn').textContent = isLast ? T('obGetStartedBtn') : T('obNextBtn');
+  $('#btnSkipOnboarding').style.visibility = isLast ? 'hidden' : 'visible';
+}
+function finishOnboarding(){
+  markOnboardingSeen();
+  $('#onboardingOverlay').classList.add('hidden');
+  switchTab('planner');
+}
+function wireOnboarding(){
+  $('#obNextBtn').onclick = ()=>{
+    if (obIndex < ONBOARDING_SLIDE_COUNT-1){ obIndex++; renderOnboardingStep(); }
+    else { finishOnboarding(); }
+  };
+  $('#btnSkipOnboarding').onclick = ()=>{
+    markOnboardingSeen();
+    $('#onboardingOverlay').classList.add('hidden');
+  };
+}
+function maybeShowOnboarding(){
+  if (hasSeenOnboarding()){
+    $('#onboardingOverlay').classList.add('hidden');
+    return;
+  }
+  obIndex = 0;
+  renderOnboardingStep();
+  $('#onboardingOverlay').classList.remove('hidden');
+}
 
 /* ---------------------------------------------------------------- */
 /* HOME TAB                                                          */
@@ -4090,6 +4332,7 @@ function renderCompare(){
   }
   const tf = state.compareTf || '10Y';
   const months = COMPARE_TF_MONTHS[tf];
+  const years = Math.round(months/12);
   const cmp = cachedComparison();
   const tfWrap = $('#compareTfStrip'); tfWrap.innerHTML = '';
   COMPARE_TIMEFRAMES.forEach(t=>{
@@ -4099,36 +4342,77 @@ function renderCompare(){
     b.onclick = ()=>{ state.compareTf = t; renderCompare(); };
     tfWrap.appendChild(b);
   });
-  const labels=[]; const drSeries=[]; const osSeries=[];
+
+  // Hero headline -- lead with the number, not the chart.
+  $('#compareHeroValue').textContent = fmtBaht(benefitCostDiff(months));
+
+  // Side-by-side final value comparison -- much easier to read at a glance than two
+  // nearly-overlapping lines on a chart.
+  const drFinal = cmp.dr.valueSeries[months];
+  const osFinal = cmp.overseas.valueSeries[months];
+  const maxFinal = Math.max(drFinal, osFinal, 1);
+  $('#compareBarsTitle').textContent = T('compareBarsTitle').replace('{years}', years+' '+T('yearsLabel').toLowerCase());
+  $('#compareBarDrValue').textContent = fmtBaht(drFinal);
+  $('#compareBarOsValue').textContent = fmtBaht(osFinal);
+  $('#compareBarDr').style.width = (100*drFinal/maxFinal).toFixed(1)+'%';
+  $('#compareBarOs').style.width = (100*osFinal/maxFinal).toFixed(1)+'%';
+
+  // Gap chart -- a single "your accumulated savings" series is far more legible than
+  // plotting both absolute-value series, which track so closely they look identical.
+  const labels=[]; const gapSeries=[];
   const step = Math.max(1, Math.round(months/40));
   for (let m=0;m<=months;m+=step){
     labels.push((m/12).toFixed(1));
-    drSeries.push(Math.round(cmp.dr.valueSeries[m]));
-    osSeries.push(Math.round(cmp.overseas.valueSeries[m]));
+    gapSeries.push(Math.round(cmp.dr.valueSeries[m] - cmp.overseas.valueSeries[m]));
   }
   if (charts.compare) charts.compare.destroy();
   charts.compare = new Chart($('#compareChart').getContext('2d'), {
     type:'line',
     data:{ labels, datasets:[
-      { label:T('portCompareDrLabel'), data:drSeries, borderColor:'#C8232A', backgroundColor:'rgba(200,35,42,0.08)', fill:true, pointRadius:0, borderWidth:2.5, tension:0.2 },
-      { label:T('portCompareOverseasLabel'), data:osSeries, borderColor:'#9aa4b5', borderDash:[4,3], fill:false, pointRadius:0, borderWidth:1.75, tension:0.2 }
+      { label:T('compareGapSeriesLabel'), data:gapSeries, borderColor:'#C8232A', backgroundColor:'rgba(200,35,42,0.12)', fill:true, pointRadius:0, borderWidth:2.5, tension:0.25 }
     ]},
     options:{ maintainAspectRatio:false,
       scales:{ x:{ title:{ display:true, text: LANG==='th'?'ปี':'Years', color:chartTextColor() }, ticks:{ color:chartTextColor() }, grid:{ color:chartGridColor() } },
         y:{ ticks:{ color:chartTextColor(), callback:(v)=>fmtBaht(v) }, grid:{ color:chartGridColor() } } },
-      plugins:{ legend:{ display:true, labels:{ boxWidth:10, font:{ size:10 }, color:chartTextColor() } } } }
+      plugins:{ legend:{ display:false } } }
   });
-  $('#compareCostValue').textContent = fmtBaht(benefitCostDiff(months));
-  const rows = [
-    [T('compareFxRateLabel'), FX.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' THB/USD'],
-    [T('compareFxCostLabel'), '1.5%'],
-    [T('compareTaxDragLabel'), '0.5%/yr']
-  ];
-  $('#compareDetailRows').innerHTML = rows.map(([l,v])=>'<div class="mkd-info-row"><span class="mir-label">'+l+'</span><span class="mir-value">'+v+'</span></div>').join('');
+
+  $('#compareBreakdownFxSub').textContent = T('compareBreakdownFxSub').replace('{rate}', FX.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' THB/USD');
+  $('#compareBreakdownTaxSub').textContent = T('compareBreakdownTaxSub');
 }
 function wireCompareOverlay(){
   $('#btnOpenCompare').onclick = ()=>{ state.compareTf = state.compareTf || '10Y'; renderCompare(); openOverlay('overlay-compare'); };
   $('#btnCloseCompare').onclick = ()=> closeOverlay('overlay-compare');
+}
+
+/* ---------------------------------------------------------------- */
+/* DR GLOBAL INDEX PAGE                                              */
+/* ---------------------------------------------------------------- */
+function renderDrGlobalIndexPage(){
+  const summary = actualPortfolioSummary(state.actualHoldings);
+  const totalValue = summary.totalValue;
+  const unlocked = totalValue >= AUTO_INVESTING_UNLOCK_THB;
+  const pct = Math.min(1, totalValue / AUTO_INVESTING_UNLOCK_THB);
+  $('#dgiFill').style.width = (pct*100).toFixed(1)+'%';
+  $('#dgiPctLabel').textContent = Math.round(pct*100)+'%';
+  $('#dgiValueRow').textContent = unlocked
+    ? T('progressUnlockedLabel')
+    : fmtBaht(totalValue) + ' / ' + fmtBaht(AUTO_INVESTING_UNLOCK_THB) + ' ' + T('progressToUnlockLabel');
+
+  const wrap = $('#dgiBenefitsList'); wrap.innerHTML = '';
+  T('dgiBenefits').forEach(b=>{
+    const item = document.createElement('div'); item.className = 'benefit-list-item';
+    item.innerHTML = '<div class="bli-title">'+b.title+'</div><div class="bli-body">'+b.body+'</div>';
+    wrap.appendChild(item);
+  });
+}
+function openDrGlobalIndexPage(){
+  renderDrGlobalIndexPage();
+  openOverlay('overlay-dr-global-index');
+}
+function wireDrGlobalIndexPage(){
+  $('#unlockProgress').onclick = openDrGlobalIndexPage;
+  $('#btnCloseDrGlobalIndex').onclick = ()=> closeOverlay('overlay-dr-global-index');
 }
 
 /* Home-banner "see more" — savings on the CURRENT actual portfolio only, no backtest chart. */
@@ -5171,6 +5455,7 @@ function init(){
   wireBuildOwnOverlay();
   wireCompareOverlay();
   wireBenefitDetailOverlay();
+  wireDrGlobalIndexPage();
   wireActivityOverlay();
   wireScheduleOverlay();
   wireOptimizeOverlay();
@@ -5192,6 +5477,8 @@ function init(){
   wireSolutionFlowButtons();
   wireEmptyStateButtons();
   renderPortfolioTab();
+  wireOnboarding();
+  maybeShowOnboarding();
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
 else init();
