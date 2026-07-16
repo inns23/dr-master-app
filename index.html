@@ -604,6 +604,15 @@
   .unlock-progress .up-fill { height:100%; background:var(--red); border-radius:100px; transition:width 0.4s ease; }
   .unlock-progress .goal-actions { display:flex; gap:14px; margin-top:9px; }
   .unlock-progress .goal-actions button { background:none; border:none; font-size:11px; font-weight:700; color:var(--muted); cursor:pointer; font-family:inherit; text-decoration:underline; padding:0; }
+  /* The DR Global Index teaser is a singleton (#unlockProgress), styled distinctly from the reusable
+     .unlock-progress card used for custom savings goals -- given the same navy gradient + white fill
+     as the DR Global Index detail page's own progress bar (.dgi-hero .dgi-fill) so it reads as a
+     preview of that page, and sized up so it's the most prominent thing in this part of the tab. */
+  #unlockProgress { background:linear-gradient(135deg,#16233f,#2a4d8f 65%,#3f6fc4); padding:18px 16px; }
+  #unlockProgress .up-row { color:#fff; font-size:12.5px; margin-bottom:10px; }
+  #unlockProgress .up-row .up-muted { color:#cfdcf3; font-weight:700; }
+  #unlockProgress .up-track { height:12px; background:rgba(255,255,255,0.18); }
+  #unlockProgress .up-fill { background:#fff; }
   .btn-set-goal { width:100%; }
 
   /* ---------- DR GLOBAL INDEX PAGE ---------- */
@@ -1173,9 +1182,9 @@
     </div>
     <div class="overlay-body">
       <div class="profile-row">
-        <div class="pr-avatar">IN</div>
+        <div class="pr-avatar">DR</div>
         <div class="pr-mid">
-          <div class="pr-name" id="moreProfileName">Inns</div>
+          <div class="pr-name" id="moreProfileName" data-t="moreProfileName">My Profile</div>
           <div class="pr-sub" data-t="moreProfileSub">Bualuang Wealth Connex investor</div>
         </div>
         <span class="chevron">›</span>
@@ -1826,6 +1835,7 @@ const STRINGS = {
     receiptQtyLabel:"Quantity", receiptPriceLabel:"Price", receiptTotalLabel:"Total",
     receiptPortfolioLabel:"Portfolio", receiptStatusLabel:"Status", receiptDateLabel:"Date",
     holdDetailShares:"Shares", holdDetailMarket:"Market price", holdDetailAvgPrice:"Avg price", holdDetailDayPnl:"1-day P&L",
+    holdDetailWeight:"Weight", holdDetailValue:"Value",
     wrappedTitle:"Wealth Wrapped",
     wrappedPeriodMonthly:"This month", wrappedPeriodYearly:"This year",
     wrappedEmptyDesc:"Buy or build a portfolio first, then come back for your Wrapped.",
@@ -1998,7 +2008,7 @@ const STRINGS = {
       { q:"If your investment horizon suddenly got shorter, how would you feel?", opts:["Very uncomfortable — I need this money safe","Somewhat cautious","Fairly relaxed about it","Not worried — I'd just keep going"] }
     ],
 
-    settingsTitle:"Settings", moreProfileSub:"Bualuang Wealth Connex investor",
+    settingsTitle:"Settings", moreProfileName:"My Profile", moreProfileSub:"Bualuang Wealth Connex investor",
     moreDarkMode:"Dark mode",
     moreLanguage:"Language", moreAboutTitle:"About the DR01 Portfolio Builder", moreMethodologyTitle:"Methodology & assumptions", moreResetTitle:"Reset my plan",
     moreResetAllTitle:"Reset all", resetAllConfirm:"This will reset the entire app back to its starting state — your Actual portfolio, Simulated portfolio, favorites, and settings will all be cleared. Continue?",
@@ -2137,6 +2147,7 @@ const STRINGS = {
     receiptQtyLabel:"จำนวนหน่วย", receiptPriceLabel:"ราคา", receiptTotalLabel:"ยอดรวม",
     receiptPortfolioLabel:"พอร์ต", receiptStatusLabel:"สถานะ", receiptDateLabel:"วันที่",
     holdDetailShares:"จำนวนหน่วย", holdDetailMarket:"ราคาตลาด", holdDetailAvgPrice:"ราคาทุนเฉลี่ย", holdDetailDayPnl:"กำไร/ขาดทุนวันนี้",
+    holdDetailWeight:"น้ำหนัก", holdDetailValue:"มูลค่า",
     wrappedTitle:"Wealth Wrapped",
     wrappedPeriodMonthly:"เดือนนี้", wrappedPeriodYearly:"ปีนี้",
     wrappedEmptyDesc:"ซื้อหรือสร้างพอร์ตก่อน แล้วค่อยกลับมาดู Wrapped ของคุณ",
@@ -2309,7 +2320,7 @@ const STRINGS = {
       { q:"ถ้าระยะเวลาลงทุนสั้นลงกะทันหัน คุณจะรู้สึกอย่างไร?", opts:["กังวลมาก ต้องการเงินก้อนนี้ปลอดภัย","ค่อนข้างระมัดระวัง","ค่อนข้างสบายใจ","ไม่กังวล จะลงทุนต่อไป"] }
     ],
 
-    settingsTitle:"ตั้งค่า", moreProfileSub:"นักลงทุน Bualuang Wealth Connex",
+    settingsTitle:"ตั้งค่า", moreProfileName:"โปรไฟล์ของฉัน", moreProfileSub:"นักลงทุน Bualuang Wealth Connex",
     moreDarkMode:"โหมดมืด",
     moreLanguage:"ภาษา", moreAboutTitle:"เกี่ยวกับ DR01 Portfolio Builder", moreMethodologyTitle:"วิธีการคำนวณ & สมมติฐาน", moreResetTitle:"เริ่มแผนใหม่",
     moreResetAllTitle:"รีเซ็ตทั้งหมด", resetAllConfirm:"การดำเนินการนี้จะรีเซ็ตแอปทั้งหมดกลับสู่ค่าเริ่มต้น — พอร์ตจริง พอร์ตจำลอง รายการโปรด และการตั้งค่าทั้งหมดจะถูกล้าง ต้องการดำเนินการต่อหรือไม่?",
@@ -3233,11 +3244,11 @@ function maybeShowOnboarding(){
 /* ---------------------------------------------------------------- */
 const HOME_TOP_PICKS = ['NVDA','MSFT','AAPL','TSLA','GOOGL','AMZN'];
 
-const USER_NAME = { en:'Khun Pichet', th:'คุณพิเชษฐ' };
+// No user name anywhere in the app -- this is a shared demo build, not tied to one persona.
 function renderGreeting(){
   const h = new Date().getHours();
   const part = h < 12 ? (LANG==='th'?'สวัสดีตอนเช้า':'Good morning') : h < 18 ? (LANG==='th'?'สวัสดีตอนบ่าย':'Good afternoon') : (LANG==='th'?'สวัสดีตอนเย็น':'Good evening');
-  $('#homeGreeting').textContent = part + ', ' + USER_NAME[LANG];
+  $('#homeGreeting').textContent = part;
 }
 
 function renderMarketStrip(){
@@ -3774,6 +3785,46 @@ function buildExpandableHoldingRow(h){
   };
   return wrap;
 }
+// Planner-built Simulated holdings (h has {symbol, underlyingSymbol, bucket, mu, sigma, weight}) have
+// no real qty/cost-basis -- they're a hypothetical backtested allocation, not a transaction. So this
+// mirrors buildExpandableHoldingRow's tap-to-expand + Buy/Sell UX, but the stats shown are weight/
+// value/expected-return/volatility instead of shares/avg-price/day-P&L. Buy/Sell still work: Buy adds
+// a real position into the Simulated portfolio's manual ledger; Sell will correctly show "0 available"
+// via ownedQty() unless the user has also actually bought real units of that symbol.
+function buildExpandablePlannerHoldingRow(h, backtestNav){
+  const value = h.weight * backtestNav;
+  const sleeve = BUCKETS[h.bucket] ? BUCKETS[h.bucket].sleeve : null;
+  const sleeveLabel = sleeve ? SLEEVE_LABEL[sleeve][LANG] : '';
+  const wrap = document.createElement('div'); wrap.className = 'holding-row-wrap';
+  const row = document.createElement('div'); row.className = 'holding-row';
+  row.innerHTML = '<div class="h-avatar">'+h.underlyingSymbol.slice(0,3)+'</div>' +
+    '<div class="h-mid"><div class="h-sym">'+h.symbol+'</div><div class="h-bucket">'+fmtPctPlain(h.weight)+' · '+sleeveLabel+'</div></div>' +
+    '<div class="h-right"><div class="h-weight">'+fmtBaht(value)+'</div></div>' +
+    '<div class="h-chevron">›</div>';
+  const detail = document.createElement('div'); detail.className = 'holding-detail';
+  wrap.appendChild(row); wrap.appendChild(detail);
+  row.onclick = ()=>{
+    if (wrap.classList.contains('expanded')){ wrap.classList.remove('expanded'); return; }
+    wrap.classList.add('expanded');
+    if (!detail.dataset.filled){
+      const rows = [
+        [T('holdDetailWeight'), fmtPctPlain(h.weight)],
+        [T('holdDetailValue'), fmtBaht(value)],
+        [T('statExpReturn'), fmtPct(h.mu)],
+        [T('statVol'), fmtPctPlain(h.sigma)]
+      ];
+      detail.innerHTML = rows.map(([l,v])=>'<div class="mkd-info-row"><span class="mir-label">'+l+'</span><span class="mir-value">'+v+'</span></div>').join('') +
+        '<div class="holding-detail-actions">' +
+          '<button class="btn primary hd-buy-btn">'+T('mkBuyBtn')+'</button>' +
+          '<button class="btn sell hd-sell-btn">'+T('mkSellBtn')+'</button>' +
+        '</div>';
+      detail.querySelector('.hd-buy-btn').onclick = (e)=>{ e.stopPropagation(); openBuySell(h.symbol, 'buy'); };
+      detail.querySelector('.hd-sell-btn').onclick = (e)=>{ e.stopPropagation(); openBuySell(h.symbol, 'sell'); };
+      detail.dataset.filled = '1';
+    }
+  };
+  return wrap;
+}
 function logTransaction(target, tx){
   const list = state.transactions[target];
   list.unshift({ id: Date.now()+'-'+Math.random().toString(36).slice(2), ts: Date.now(), ...tx });
@@ -4091,10 +4142,12 @@ function renderSimulatedPortfolio(){
         '<span class="acc-bar"></span>' +
         '<div class="acc-mid"><div class="acc-title">'+SLEEVE_LABEL[sleeveKey][LANG]+'</div><div class="acc-sub">'+holdingsInSleeve.length+' '+(LANG==='th'?'รายการ':'holdings')+'</div></div>' +
         '<div class="acc-right"><div class="acc-pct">'+fmtPctPlain(sleevePct)+'</div><div class="acc-value">'+fmtBaht(sleevePct*nav)+'</div></div>' +
-      '</div>' +
-      '<div class="accordion-body" id="'+bodyId+'">' +
-        holdingsInSleeve.map(h=>'<div class="ab-row"><span class="ab-sym">'+h.symbol+'</span><span class="ab-w">'+fmtPctPlain(h.weight)+' · '+fmtBaht(h.weight*backtestNav)+'</span></div>').join('') +
       '</div>';
+    const body = document.createElement('div'); body.className = 'accordion-body'; body.id = bodyId;
+    // Tappable rows with a detail panel + Buy/Sell, same interaction as Actual holdings and the
+    // manually-added Simulated rows below -- previously these were static, unclickable text.
+    holdingsInSleeve.forEach(h=>{ body.appendChild(buildExpandablePlannerHoldingRow(h, backtestNav)); });
+    item.appendChild(body);
     accWrap.appendChild(item);
   });
   $all('.accordion-head', accWrap).forEach(head=>{
@@ -4740,9 +4793,26 @@ function runOptimize(){
   const currentStats = portfolioStats(current);
   const currentBT = runBacktest(current, 0, 1000000, 'opt-cur-'+target);
 
-  const minR = 0.04, maxR = 0.16;
+  // Bug fix: this used to interpolate targetReturn across a hardcoded 4%-16% range that doesn't match
+  // what any real portfolio here can actually achieve (the conservative..aggressive proxy range is
+  // ~8.7%-12.6%, computed below). Since sleeveWeightsForTargetReturn() clamps out-of-range requests to
+  // the nearest canonical profile, risk levels 1-2 both silently clamped to "conservative" and 4-5 both
+  // clamped to "aggressive" -- so half the risk slider did nothing, which is exactly the "doesn't really
+  // work / weird" behavior reported. Deriving the range from the actual profile proxies (same values
+  // generatePresetsFromTargetReturn already uses) makes every risk level 1-5 produce a genuinely
+  // different, correctly-ordered result, with 1 and 5 landing exactly on the conservative/aggressive
+  // presets rather than past them.
+  const minR = PROFILE_RETURN_PROXY[PROFILE_ORDER[0]];
+  const maxR = PROFILE_RETURN_PROXY[PROFILE_ORDER[PROFILE_ORDER.length-1]];
   const targetReturn = minR + (risk-1)/4 * (maxR-minR);
-  const optimized = buildPortfolio(null, { targetReturn, seedTag:'opt-new-'+target+'-risk'+risk });
+  // Also scale holding count with risk (6 at risk 1 -> 10 at risk 5, matching the canonical profiles'
+  // own defaults) instead of always defaulting to 8 regardless of risk -- a conservative optimize
+  // should look and feel like the conservative preset, not a differently-weighted version of the same
+  // 8 names.
+  const minHold = DEFAULT_MAX_HOLDINGS[PROFILE_ORDER[0]];
+  const maxHold = DEFAULT_MAX_HOLDINGS[PROFILE_ORDER[PROFILE_ORDER.length-1]];
+  const maxHoldings = Math.round(minHold + (risk-1)/4 * (maxHold-minHold));
+  const optimized = buildPortfolio(null, { targetReturn, maxHoldings, seedTag:'opt-new-'+target+'-risk'+risk });
   const optimizedStats = portfolioStats(optimized);
   const optimizedBT = runBacktest(optimized, 0, 1000000, 'opt-new-'+target+'-risk'+risk+'-bt');
 
@@ -5115,10 +5185,7 @@ function wireWealthWrapped(){
 // Opens the device share sheet (native mobile browsers/PWAs) with a ready-made referral message;
 // falls back to copying the text to the clipboard on desktop browsers that don't support
 // navigator.share, since there's no share sheet to hand off to there.
-function shareWrapped(){
-  const share = state._wrappedShare;
-  if (!share) return;
-  const fullText = share.text + '\n' + share.url;
+function shareWrappedTextOnly(share, fullText){
   if (navigator.share){
     navigator.share({ title:'DR Master', text: share.text, url: share.url }).catch(()=>{});
     return;
@@ -5130,6 +5197,37 @@ function shareWrapped(){
     return;
   }
   showToast(T('wrappedShareCopyFailed'));
+}
+// Tries to attach the actual rendered share-card PNG (in the user's chosen color) to the native share,
+// so the recipient sees the image, not just text -- this is the Web Share Level 2 "files" capability,
+// which not every browser supports even when navigator.share itself exists (notably: most desktop
+// browsers support share() but not files). canShare() is the correct feature-detection call; a browser
+// can implement share() without being able to share files, so it must be checked separately and
+// per-payload, not assumed from share() existing alone.
+function shareWrapped(){
+  const share = state._wrappedShare;
+  if (!share) return;
+  const fullText = share.text + '\n' + share.url;
+  const canvas = $('#wrappedShareCanvas');
+  const canTryImage = canvas && canvas.toBlob && navigator.share && navigator.canShare;
+  if (!canTryImage){
+    shareWrappedTextOnly(share, fullText);
+    return;
+  }
+  canvas.toBlob((blob)=>{
+    if (!blob){ shareWrappedTextOnly(share, fullText); return; }
+    try {
+      const file = new File([blob], 'dr-master-wealth-wrapped.png', { type:'image/png' });
+      const withImage = { title:'DR Master', text: share.text, url: share.url, files:[file] };
+      if (navigator.canShare(withImage)){
+        navigator.share(withImage).catch(()=>{});
+      } else {
+        shareWrappedTextOnly(share, fullText);
+      }
+    } catch(err){
+      shareWrappedTextOnly(share, fullText);
+    }
+  }, 'image/png');
 }
 
 function wireActivityOverlay(){
@@ -5596,8 +5694,6 @@ function renderStaticText(){
     const val = T(key);
     if (typeof val === 'string') el.setAttribute('placeholder', val);
   });
-  $('#moreProfileName').textContent = USER_NAME[LANG];
-  $('.pr-avatar').textContent = LANG==='th' ? 'พช' : 'PC';
 }
 function setLanguage(lang){
   LANG = lang;
