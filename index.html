@@ -751,22 +751,6 @@
         </button>
       </header>
 
-      <div class="benefit-card">
-        <div class="bf-head">
-          <div class="bf-title" data-t="portBenefitTitle">Benefit of DR01</div>
-        </div>
-        <div id="benefitSavedWrap">
-          <div class="bf-save-label" data-t="portBenefitSave">You could save</div>
-          <div class="bf-save-value" id="benefitSaveValue">–</div>
-          <p class="bf-body" data-t="portBenefitBody"></p>
-        </div>
-        <div id="benefitTeaserWrap" style="display:none;">
-          <div class="bf-teaser-title" id="benefitTeaserTitle">–</div>
-          <p class="bf-body" id="benefitTeaserBody"></p>
-        </div>
-        <button class="btn ghost" id="btnOpenCompare" style="background:var(--card); margin-top:10px;" data-t="portBenefitSeeAll">See all</button>
-      </div>
-
       <div class="mode-toggle">
         <button class="active" data-portview="actual" data-t="portToggleActual">Actual</button>
         <button data-portview="simulated" data-t="portToggleSimulated">Simulated</button>
@@ -783,6 +767,16 @@
         </div>
 
         <div id="portSimFilled" style="display:none;">
+          <div class="benefit-card">
+            <div class="bf-head">
+              <div class="bf-title" data-t="portBenefitTitle">Benefit of DR01</div>
+            </div>
+            <div class="bf-save-label" data-t="portBenefitSave">You could save</div>
+            <div class="bf-save-value" id="benefitSaveValue-simulated">–</div>
+            <p class="bf-body" data-t="portBenefitBody"></p>
+            <button class="btn ghost" id="btnOpenCompare-simulated" style="background:var(--card); margin-top:10px;" data-t="portBenefitSeeAll">See all</button>
+          </div>
+
           <div id="customGoalList-simulated"></div>
           <button class="btn ghost btn-set-goal" data-goalview="simulated" id="btnSetGoal-simulated" style="margin-bottom:14px;">Set a goal</button>
           <p class="hint" id="goalMaxHint-simulated" style="display:none; margin:-8px 0 14px;" data-t="goalMaxHint">You can set up to 3 goals per portfolio.</p>
@@ -857,6 +851,16 @@
         </div>
 
         <div id="portActualFilled" style="display:none;">
+          <div class="benefit-card">
+            <div class="bf-head">
+              <div class="bf-title" data-t="portBenefitTitle">Benefit of DR01</div>
+            </div>
+            <div class="bf-save-label" data-t="portBenefitSave">You could save</div>
+            <div class="bf-save-value" id="benefitSaveValue-actual">–</div>
+            <p class="bf-body" data-t="portBenefitBody"></p>
+            <button class="btn ghost" id="btnOpenCompare-actual" style="background:var(--card); margin-top:10px;" data-t="portBenefitSeeAll">See all</button>
+          </div>
+
           <div class="milestone-banner" id="milestoneBanner" style="display:none;">
             <button class="mb-dismiss" id="milestoneDismissBtn">✕</button>
             <div class="mb-title" data-t="milestoneTitle">You've unlocked DR Global Index</div>
@@ -1359,6 +1363,11 @@
       <div style="width:30px;"></div>
     </div>
     <div class="overlay-body">
+      <div class="mode-toggle" id="compareViewToggle">
+        <button data-view="actual" data-t="portToggleActual">Actual</button>
+        <button data-view="simulated" data-t="portToggleSimulated">Simulated</button>
+      </div>
+
       <p class="hint" data-t="portCompareSub"></p>
 
       <div id="compareBenefitsWrap" style="display:none;">
@@ -3197,12 +3206,14 @@ function renderMarketStrip(){
 /* ---- HOME: banner carousel (auto-slide + swipe/arrows, tap-through) ---- */
 let bannerTimer = null;
 function buildBenefitBannerSlide(){
-  const empty = portfolioIsEmpty();
+  // The Home banner always reflects the Actual portfolio -- it's a teaser about the user's
+  // real account, not whichever view they last had open in the Portfolio tab.
+  const empty = portfolioIsEmpty('actual');
   if (empty){
     const item = T('dr01Benefits')[0];
     return { tag: T('benefitBannerTagTeaser'), title: item.title, sub: item.body, action:'benefit' };
   }
-  const saved = fmtBaht(benefitCostDiff(120));
+  const saved = fmtBaht(benefitCostDiff(120, 'actual'));
   return { tag: T('benefitBannerTag'), title: T('benefitBannerTitle').replace('{amount}', saved), sub: T('benefitBannerSub'), action:'benefit' };
 }
 function renderBanner(){
@@ -3782,6 +3793,7 @@ function finalizeConfirmedOrder(){
   state._lastReceipt = { symbol:u.symbol, underlyingName:u.underlyingName, side:order.side, orderType:order.orderType,
     qty, price:fillPrice, notional:fillPrice*qty, status, target, ts:Date.now() };
   state._pendingOrder = null;
+  state._cmpCache = {}; // holdings just changed -- don't let the Home banner or Compare screen show stale savings numbers
 
   renderHomeTab();
   closeOverlay('overlay-passcode');
@@ -3953,7 +3965,9 @@ function renderPortfolioTab(){
   $('#portView-simulated').style.display = state.portfolioViewMode==='simulated' ? 'block' : 'none';
   $('#portView-actual').style.display = state.portfolioViewMode==='actual' ? 'block' : 'none';
   $all('.mode-toggle button[data-portview]').forEach(b=>b.classList.toggle('active', b.dataset.portview===state.portfolioViewMode));
-  renderBenefitCard();
+  state._cmpCache = {}; // holdings may have changed since last render -- invalidate both views' caches
+  renderBenefitCard('actual');
+  renderBenefitCard('simulated');
   renderSimulatedPortfolio();
   renderActualPortfolio();
 }
@@ -4281,38 +4295,31 @@ function wireBuildOwnOverlay(){
 /* ---------------------------------------------------------------- */
 // weight-converted view of the Actual portfolio only -- the Benefit-of-DR01 savings figure is always
 // computed from what the user actually holds, not a Simulated/default stand-in.
-function actualHoldingsAsWeights(){
-  if (!state.actualHoldings || state.actualHoldings.length===0) return [];
-  const totalQtyValue = state.actualHoldings.reduce((s,h)=>s+navPriceTHB(h)*h.qty, 0) || 1;
-  return state.actualHoldings.map(h=>({ ...h, weight:(navPriceTHB(h)*h.qty)/totalQtyValue }));
-}
 const COMPARE_TIMEFRAMES = ['1Y','3Y','5Y','10Y'];
 const COMPARE_TF_MONTHS = { '1Y':12, '3Y':36, '5Y':60, '10Y':120 };
-function cachedComparison(){
-  if (!state._cmpCache) state._cmpCache = runComparisonBacktest(actualHoldingsAsWeights(), 0, COMPARE_LUMPSUM, BACKTEST_FACTOR_SEED);
-  return state._cmpCache;
+// Comparison backtest is cached per-view (actual/simulated) so switching the toggle never shows
+// stale numbers from the other portfolio, and each view's holdings never bleed into the other's.
+function cachedComparison(view){
+  if (!state._cmpCache) state._cmpCache = {};
+  if (!state._cmpCache[view]){
+    const holdings = getOptimizeInputHoldings(view) || [];
+    state._cmpCache[view] = runComparisonBacktest(holdings, 0, COMPARE_LUMPSUM, BACKTEST_FACTOR_SEED);
+  }
+  return state._cmpCache[view];
 }
-function benefitCostDiff(months){
-  const cmp = cachedComparison();
+function benefitCostDiff(months, view){
+  const cmp = cachedComparison(view);
   return Math.max(0, cmp.dr.valueSeries[months] - cmp.overseas.valueSeries[months]);
 }
-function portfolioIsEmpty(){
-  return !state.actualHoldings || state.actualHoldings.length===0;
+function portfolioIsEmpty(view){
+  return !getOptimizeInputHoldings(view);
 }
-function renderBenefitCard(){
-  state._cmpCache = null; // holdings may have changed since last render
-  const empty = portfolioIsEmpty();
-  $('#benefitSavedWrap').style.display = empty ? 'none' : 'block';
-  $('#benefitTeaserWrap').style.display = empty ? 'block' : 'none';
-  if (empty){
-    const benefits = T('dr01Benefits');
-    state.benefitTeaserIdx = ((state.benefitTeaserIdx||0) + 1) % benefits.length;
-    const item = benefits[state.benefitTeaserIdx];
-    $('#benefitTeaserTitle').textContent = item.title;
-    $('#benefitTeaserBody').textContent = item.body;
-  } else {
-    $('#benefitSaveValue').textContent = fmtBaht(benefitCostDiff(120));
-  }
+// Each view's benefit card only lives inside that view's *Filled block, so it's only ever
+// rendered once that view actually has holdings -- no separate empty/teaser branch needed here.
+function renderBenefitCard(view){
+  const el = $('#benefitSaveValue-'+view);
+  if (!el || portfolioIsEmpty(view)) return;
+  el.textContent = fmtBaht(benefitCostDiff(120, view));
 }
 function renderBenefitsList(){
   const wrap = $('#benefitsList'); wrap.innerHTML = '';
@@ -4323,7 +4330,9 @@ function renderBenefitsList(){
   });
 }
 function renderCompare(){
-  const empty = portfolioIsEmpty();
+  const view = state.compareView || 'actual';
+  $all('#compareViewToggle button').forEach(b=> b.classList.toggle('active', b.dataset.view===view));
+  const empty = portfolioIsEmpty(view);
   $('#compareBenefitsWrap').style.display = empty ? 'block' : 'none';
   $('#compareNumericWrap').style.display = empty ? 'none' : 'block';
   if (empty){
@@ -4333,7 +4342,7 @@ function renderCompare(){
   const tf = state.compareTf || '10Y';
   const months = COMPARE_TF_MONTHS[tf];
   const years = Math.round(months/12);
-  const cmp = cachedComparison();
+  const cmp = cachedComparison(view);
   const tfWrap = $('#compareTfStrip'); tfWrap.innerHTML = '';
   COMPARE_TIMEFRAMES.forEach(t=>{
     const b = document.createElement('button');
@@ -4344,7 +4353,7 @@ function renderCompare(){
   });
 
   // Hero headline -- lead with the number, not the chart.
-  $('#compareHeroValue').textContent = fmtBaht(benefitCostDiff(months));
+  $('#compareHeroValue').textContent = fmtBaht(benefitCostDiff(months, view));
 
   // Side-by-side final value comparison -- much easier to read at a glance than two
   // nearly-overlapping lines on a chart.
@@ -4380,8 +4389,18 @@ function renderCompare(){
   $('#compareBreakdownFxSub').textContent = T('compareBreakdownFxSub').replace('{rate}', FX.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' THB/USD');
   $('#compareBreakdownTaxSub').textContent = T('compareBreakdownTaxSub');
 }
+function openCompare(view){
+  state.compareView = view;
+  state.compareTf = state.compareTf || '10Y';
+  renderCompare();
+  openOverlay('overlay-compare');
+}
 function wireCompareOverlay(){
-  $('#btnOpenCompare').onclick = ()=>{ state.compareTf = state.compareTf || '10Y'; renderCompare(); openOverlay('overlay-compare'); };
+  if ($('#btnOpenCompare-actual')) $('#btnOpenCompare-actual').onclick = ()=> openCompare('actual');
+  if ($('#btnOpenCompare-simulated')) $('#btnOpenCompare-simulated').onclick = ()=> openCompare('simulated');
+  $all('#compareViewToggle button').forEach(b=>{
+    b.onclick = ()=>{ state.compareView = b.dataset.view; renderCompare(); };
+  });
   $('#btnCloseCompare').onclick = ()=> closeOverlay('overlay-compare');
 }
 
@@ -4417,7 +4436,7 @@ function wireDrGlobalIndexPage(){
 
 /* Home-banner "see more" — savings on the CURRENT actual portfolio only, no backtest chart. */
 function renderBenefitDetail(){
-  const empty = portfolioIsEmpty();
+  const empty = portfolioIsEmpty('actual');
   $('#benefitDetailEmptyWrap').style.display = empty ? 'block' : 'none';
   $('#benefitDetailFilledWrap').style.display = empty ? 'none' : 'block';
   if (empty){
@@ -4429,7 +4448,7 @@ function renderBenefitDetail(){
     });
     return;
   }
-  $('#benefitDetailSaveValue').textContent = fmtBaht(benefitCostDiff(120));
+  $('#benefitDetailSaveValue').textContent = fmtBaht(benefitCostDiff(120, 'actual'));
   const rows = [
     [T('compareFxRateLabel'), FX.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' THB/USD'],
     [T('compareFxCostLabel'), '1.5%'],
