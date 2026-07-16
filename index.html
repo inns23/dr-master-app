@@ -260,13 +260,24 @@
   .schedule-row .sr-sym { font-weight:700; font-size:13px; color:var(--ink); }
   .schedule-row .sr-meta { font-size:10.5px; color:var(--muted); margin-top:2px; }
   .schedule-row .sr-cancel { border:none; background:none; color:var(--red); font-size:11.5px; font-weight:700; cursor:pointer; flex:none; }
-  .wrapped-hero { background:linear-gradient(160deg, #2a1a5e 0%, #7b2ff7 45%, #C8232A 100%); border-radius:var(--radius-lg);
+  .wrapped-hero { background:linear-gradient(160deg, #101a35 0%, #1c2c54 55%, #2c3f74 100%); border-radius:var(--radius-lg);
     padding:30px 20px; text-align:center; color:#fff; margin-bottom:14px; }
   .wrapped-hero .wh-icon { font-size:44px; margin-bottom:10px; }
   .wrapped-hero img.wh-icon { width:220px; height:220px; object-fit:contain; margin:0 auto 14px; display:block; }
   .wrapped-hero .wh-tag { font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; opacity:0.8; margin-bottom:4px; }
   .wrapped-hero .wh-title { font-size:22px; font-weight:800; margin-bottom:8px; }
   .wrapped-hero .wh-body { font-size:13px; line-height:1.6; opacity:0.92; max-width:300px; margin:0 auto; }
+  .wrapped-color-picker { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:18px; }
+  .wcp-swatch { width:30px; height:30px; border-radius:50%; padding:0; cursor:pointer; border:2px solid rgba(255,255,255,0.35);
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,0.15); transition:transform 0.12s ease, border-color 0.12s ease; }
+  .wcp-swatch:active { transform:scale(0.92); }
+  .wcp-swatch.active { border-color:#fff; box-shadow:0 0 0 2px rgba(255,255,255,0.25); }
+  .wrapped-share-actions { display:flex; gap:10px; }
+  .wrapped-share-actions .btn { flex:1; }
+  .app-toast { position:fixed; left:50%; bottom:96px; transform:translateX(-50%) translateY(16px); z-index:999;
+    background:var(--ink); color:var(--card); font-size:12.5px; font-weight:600; padding:10px 18px; border-radius:999px;
+    box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:opacity 0.2s ease, transform 0.2s ease; max-width:82%; text-align:center; }
+  .app-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
   .wrapped-top-row { display:flex; align-items:center; gap:11px; padding:9px 0; border-bottom:1px solid var(--line); }
   .wrapped-top-row:last-child { border-bottom:none; }
   .wrapped-top-rank { width:24px; height:24px; border-radius:50%; background:var(--squircle-bg); color:var(--ink); font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; flex:none; }
@@ -1561,6 +1572,7 @@
           <div class="wh-tag" data-t="wrappedYouAreLabel">You're investing like a</div>
           <div class="wh-title" id="wrappedPersonaName">–</div>
           <div class="wh-body" id="wrappedPersonaBody">–</div>
+          <div class="wrapped-color-picker" id="wrappedColorPicker"></div>
         </div>
 
         <div class="card">
@@ -1581,7 +1593,10 @@
         <div class="card" style="text-align:center;">
           <div class="section-title" data-t="wrappedShareTitle">Share your Wrapped</div>
           <canvas id="wrappedShareCanvas" width="720" height="1280" style="width:100%; max-width:220px; border-radius:var(--radius); margin:6px auto 14px; display:block; box-shadow:var(--shadow);"></canvas>
-          <button class="btn primary" id="wrappedDownloadBtn" data-t="wrappedDownloadBtn">Download image</button>
+          <div class="wrapped-share-actions">
+            <button class="btn ghost" id="wrappedDownloadBtn" data-t="wrappedDownloadBtn">Download image</button>
+            <button class="btn primary" id="wrappedShareBtn" data-t="wrappedShareBtn">Share</button>
+          </div>
           <p class="hint" data-t="wrappedShareHint" style="margin-top:10px; margin-bottom:0;"></p>
         </div>
       </div>
@@ -1666,6 +1681,8 @@
       <div class="news-detail-body" id="ndBody"></div>
     </div>
   </div>
+
+  <div class="app-toast" id="appToast"></div>
 
 </div>
 
@@ -1825,7 +1842,16 @@ const STRINGS = {
     wrappedShareReturnLabel:"expected annual return",
     wrappedShareWatermark:"Find your Wealth Wrapped on DR MASTER",
     wrappedDownloadBtn:"Download image",
+    wrappedShareBtn:"Share",
     wrappedShareHint:"Download and share to your story — dollar amounts are never shown, just your vibe and your %.",
+    wrappedShareHookAssetMonthly:"My {symbol} is up {pct} this month on DR Master.",
+    wrappedShareHookAssetYearly:"My {symbol} is up {pct} this year on DR Master.",
+    wrappedShareHookPortfolioMonthly:"My portfolio is up {pct} this month on DR Master.",
+    wrappedShareHookPortfolioYearly:"My portfolio is up {pct} this year on DR Master.",
+    wrappedShareHookPersona:"Turns out I invest like a {persona}.",
+    wrappedShareCta:"Check out DR Master on Bualuang Wealth Connex:",
+    wrappedShareCopied:"Copied! Paste it anywhere to share.",
+    wrappedShareCopyFailed:"Couldn't share automatically — try again.",
     wrappedPersonaDcaName:"DCA Rhythm",
     wrappedPersonaDcaBody:"Your investing rhythm is metronome-steady. You've got a recurring auto-invest plan running — however choppy the market gets, you keep showing up on schedule.",
     wrappedPersonaTechName:"Tech Surfer",
@@ -2127,7 +2153,16 @@ const STRINGS = {
     wrappedShareReturnLabel:"ผลตอบแทนคาดการณ์ต่อปี",
     wrappedShareWatermark:"ค้นหา Wealth Wrapped ของคุณได้ที่ DR MASTER",
     wrappedDownloadBtn:"ดาวน์โหลดรูปภาพ",
+    wrappedShareBtn:"แชร์",
     wrappedShareHint:"ดาวน์โหลดและแชร์ลงสตอรี่ได้เลย — ไม่แสดงจำนวนเงิน มีแค่ Vibe และเปอร์เซ็นต์ของคุณ",
+    wrappedShareHookAssetMonthly:"{symbol} ในพอร์ตฉันบวกไปแล้ว {pct} ในเดือนนี้ บน DR Master",
+    wrappedShareHookAssetYearly:"{symbol} ในพอร์ตฉันบวกไปแล้ว {pct} ในปีนี้ บน DR Master",
+    wrappedShareHookPortfolioMonthly:"พอร์ตของฉันบวกไปแล้ว {pct} ในเดือนนี้ บน DR Master",
+    wrappedShareHookPortfolioYearly:"พอร์ตของฉันบวกไปแล้ว {pct} ในปีนี้ บน DR Master",
+    wrappedShareHookPersona:"ฉันลงทุนแบบ {persona}",
+    wrappedShareCta:"มาลองใช้ DR Master บน Bualuang Wealth Connex กันได้เลย:",
+    wrappedShareCopied:"คัดลอกข้อความแล้ว! นำไปวางแชร์ที่ไหนก็ได้",
+    wrappedShareCopyFailed:"แชร์อัตโนมัติไม่สำเร็จ ลองอีกครั้ง",
     wrappedPersonaDcaName:"สาย DCA Rhythm",
     wrappedPersonaDcaBody:"จังหวะการลงทุนของคุณเป๊ะเหมือนเครื่องเคาะจังหวะ คุณมีแผนลงทุนอัตโนมัติที่ทำงานต่อเนื่อง ไม่ว่าตลาดจะผันผวนแค่ไหนคุณก็ยังคงลงทุนตามกำหนดเวลาเสมอ",
     wrappedPersonaTechName:"สาย Tech Surfer",
@@ -3077,6 +3112,19 @@ const BUILD_OWN_DEFAULT_MONTHLY = 2000;
 const COMPARE_LUMPSUM = 100000;
 const BACKTEST_FACTOR_SEED = 'bucket-factors-seed-9';
 const MARKETS_PAGE_SIZE = 50;
+const WEALTH_CONNEX_URL = 'https://www.bualuang.co.th/tools-lists/tools/wealth-connex';
+
+// Small floating pill for transient feedback (e.g. "link copied") -- shared across the app,
+// not just Wrapped, so it lives with the other generic helpers up top.
+let appToastTimer = null;
+function showToast(msg){
+  const el = $('#appToast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  if (appToastTimer) clearTimeout(appToastTimer);
+  appToastTimer = setTimeout(()=> el.classList.remove('show'), 2400);
+}
 
 const state = {
   goalId: 'wealth',
@@ -3108,7 +3156,8 @@ const state = {
   byo: { selected: new Map(), query:'' }, // symbol -> weight|null
   newsDetailIdx: null,
   wrappedView: 'actual',
-  wrappedPeriod: 'monthly'
+  wrappedPeriod: 'monthly',
+  wrappedColorway: 'navy'
 };
 const charts = {};
 
@@ -3333,7 +3382,14 @@ function renderMessagesTab(){
   const rows = [];
   if (hasAnyPortfolio()){
     rows.push({ icon:'◐', title: LANG==='th'?'แนะนำให้ปรับสมดุลพอร์ต':'Portfolio rebalance suggested', sub: LANG==='th'?'ตามรอบไตรมาส':'Quarterly rebalance window' });
-    const firstSym = state.simulatedPortfolio ? state.simulatedPortfolio.holdings[0].symbol : state.actualHoldings[0].symbol;
+    // A Simulated portfolio can exist as a manual-only shell (bought straight from Markets, never
+    // run through Planner/Build-Your-Own) with an empty .holdings array -- fall through to
+    // .manualHoldings, then Actual, rather than assuming .holdings[0] exists.
+    const sp = state.simulatedPortfolio;
+    const firstHolding = (sp && sp.holdings && sp.holdings[0])
+      || (sp && sp.manualHoldings && sp.manualHoldings[0])
+      || (state.actualHoldings && state.actualHoldings[0]);
+    const firstSym = firstHolding ? firstHolding.symbol : '';
     rows.push({ icon:'＋', title: (LANG==='th'?'เพิ่ม DR ใหม่: ':'New DR added: ')+firstSym, sub: LANG==='th'?'ตามคำแนะนำพอร์ต':'Based on your portfolio plan' });
   } else {
     rows.push({ icon:'◐', title: LANG==='th'?'ยังไม่มีพอร์ต DR01':'No DR01 portfolio yet', sub: LANG==='th'?'ไปที่แผนการลงทุนเพื่อเริ่มต้น':'Visit Planner to get started' });
@@ -4730,6 +4786,56 @@ function wireOptimizeOverlay(){
 /* ---------------------------------------------------------------- */
 /* WEALTH WRAPPED -- Spotify-Wrapped-style portfolio recap            */
 /* ---------------------------------------------------------------- */
+// Muted, solid tones (no bright/rainbow gradients) the user can pick for their Wrapped card --
+// same idea as Spotify Wrapped's color picker, but deliberately toned down per feedback that the
+// old purple-to-red gradient looked "too bright and colorful."
+const WRAPPED_PALETTES = [
+  { id:'navy',     colors:['#101a35','#1c2c54','#2c3f74'] },
+  { id:'maroon',   colors:['#2a0d12','#4a141c','#6b1b26'] },
+  { id:'forest',   colors:['#0c211c','#153a2f','#1f5342'] },
+  { id:'slate',    colors:['#1b222c','#2b3745','#3c4b5c'] },
+  { id:'plum',     colors:['#1c1030','#2e1a4d','#432870'] },
+  { id:'charcoal', colors:['#17171a','#26241f','#3a352b'] }
+];
+const WRAPPED_COLORWAY_KEY = 'drmaster_wrapped_colorway';
+function getStoredWrappedColorway(){
+  try {
+    const saved = window.localStorage.getItem(WRAPPED_COLORWAY_KEY);
+    if (saved && WRAPPED_PALETTES.some(p=>p.id===saved)) return saved;
+  } catch(err){}
+  return WRAPPED_PALETTES[0].id;
+}
+function setWrappedColorway(id){
+  state.wrappedColorway = id;
+  try { window.localStorage.setItem(WRAPPED_COLORWAY_KEY, id); } catch(err){}
+}
+function currentWrappedPalette(){
+  return WRAPPED_PALETTES.find(p=>p.id===state.wrappedColorway) || WRAPPED_PALETTES[0];
+}
+function applyWrappedHeroBackground(){
+  const hero = $('#wrappedHero');
+  if (!hero) return;
+  const p = currentWrappedPalette();
+  hero.style.background = 'linear-gradient(160deg, '+p.colors[0]+' 0%, '+p.colors[1]+' 55%, '+p.colors[2]+' 100%)';
+}
+function renderWrappedColorPicker(){
+  const wrap = $('#wrappedColorPicker');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  WRAPPED_PALETTES.forEach(p=>{
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wcp-swatch' + (state.wrappedColorway===p.id ? ' active' : '');
+    b.style.background = 'linear-gradient(135deg, '+p.colors[0]+', '+p.colors[2]+')';
+    b.setAttribute('aria-label', p.id);
+    b.dataset.colorway = p.id;
+    b.onclick = ()=>{
+      setWrappedColorway(p.id);
+      renderWealthWrappedNow(); // re-render so the hero, picker highlight, and canvas all reflect the new palette
+    };
+    wrap.appendChild(b);
+  });
+}
 function getWrappedHoldingsRows(view){
   if (view === 'actual'){
     const summary = actualPortfolioSummary(state.actualHoldings || []);
@@ -4851,6 +4957,9 @@ function renderWealthWrappedNow(){
   $('#wrappedContent').style.display = empty ? 'none' : 'block';
   if (empty) return;
 
+  applyWrappedHeroBackground();
+  renderWrappedColorPicker();
+
   const persona = computeWrappedPersona(view, rows, totalValue, totalPnL);
   $('#wrappedPersonaIcon').src = persona.icon;
   $('#wrappedPersonaName').textContent = persona.name;
@@ -4880,16 +4989,45 @@ function renderWealthWrappedNow(){
     : T('wrappedBenchmarkBodyBehind').replace('{pct}', fmtPctPlain(Math.abs(diff)));
 
   drawWrappedShareCard(persona, top3, portReturn);
+  // Share text must brag about REALIZED gains only -- portReturn above is a forward-looking
+  // statistical assumption (portfolioStats().ret, correctly labeled "expected annual return" on the
+  // card itself), not what the user actually made. Recompute the actual mark-to-market return here.
+  const totalCost = totalValue - totalPnL;
+  const realizedPnlPct = totalCost > 0 ? totalPnL / totalCost : 0;
+  state._wrappedShare = buildWrappedShareText(persona, top3, realizedPnlPct, state.wrappedPeriod);
+}
+// Picks the single most flattering, honest stat to lead the share text with -- a standout holding's
+// realized gain if it's genuinely notable, else the overall realized portfolio return if it's
+// positive, else the persona type (always safe/positive, so a down period still gets a shareable
+// line instead of bragging about a loss). pnlPct here is always a REALIZED return, never the
+// forward-looking expected-return statistic shown elsewhere in Wrapped.
+function buildWrappedShareText(persona, top3, pnlPct, period){
+  const top = top3 && top3[0];
+  const topCost = top ? (top.valueTHB - (top.pnlTHB||0)) : 0;
+  const topPct = (top && topCost > 0) ? (top.pnlTHB / topCost) : null;
+  const yearly = period === 'yearly';
+  let hook;
+  if (topPct !== null && topPct >= 0.10){
+    hook = T(yearly ? 'wrappedShareHookAssetYearly' : 'wrappedShareHookAssetMonthly')
+      .replace('{symbol}', top.symbol).replace('{pct}', fmtPctPlain(topPct));
+  } else if (pnlPct > 0){
+    hook = T(yearly ? 'wrappedShareHookPortfolioYearly' : 'wrappedShareHookPortfolioMonthly')
+      .replace('{pct}', fmtPctPlain(pnlPct));
+  } else {
+    hook = T('wrappedShareHookPersona').replace('{persona}', persona.name);
+  }
+  return { text: hook + '\n\n' + T('wrappedShareCta'), url: WEALTH_CONNEX_URL };
 }
 function drawWrappedShareCard(persona, top3, portReturn){
   const canvas = $('#wrappedShareCanvas');
   if (!canvas || !canvas.getContext) return;
   const ctx = canvas.getContext('2d');
   const w = canvas.width, h = canvas.height;
+  const palette = currentWrappedPalette();
   const grad = ctx.createLinearGradient(0, 0, w*0.3, h);
-  grad.addColorStop(0, '#2a1a5e');
-  grad.addColorStop(0.5, '#7b2ff7');
-  grad.addColorStop(1, '#C8232A');
+  grad.addColorStop(0, palette.colors[0]);
+  grad.addColorStop(0.5, palette.colors[1]);
+  grad.addColorStop(1, palette.colors[2]);
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, w, h);
 
@@ -4953,6 +5091,7 @@ function openWealthWrappedFor(view){
   openOverlay('overlay-wrapped');
 }
 function wireWealthWrapped(){
+  state.wrappedColorway = getStoredWrappedColorway();
   $('#moreWrapped').onclick = openWealthWrapped;
   if ($('#btnWrapped-actual')) $('#btnWrapped-actual').onclick = ()=> openWealthWrappedFor('actual');
   if ($('#btnWrapped-simulated')) $('#btnWrapped-simulated').onclick = ()=> openWealthWrappedFor('simulated');
@@ -4971,6 +5110,26 @@ function wireWealthWrapped(){
     link.href = canvas.toDataURL('image/png');
     link.click();
   };
+  $('#wrappedShareBtn').onclick = shareWrapped;
+}
+// Opens the device share sheet (native mobile browsers/PWAs) with a ready-made referral message;
+// falls back to copying the text to the clipboard on desktop browsers that don't support
+// navigator.share, since there's no share sheet to hand off to there.
+function shareWrapped(){
+  const share = state._wrappedShare;
+  if (!share) return;
+  const fullText = share.text + '\n' + share.url;
+  if (navigator.share){
+    navigator.share({ title:'DR Master', text: share.text, url: share.url }).catch(()=>{});
+    return;
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(fullText)
+      .then(()=> showToast(T('wrappedShareCopied')))
+      .catch(()=> showToast(T('wrappedShareCopyFailed')));
+    return;
+  }
+  showToast(T('wrappedShareCopyFailed'));
 }
 
 function wireActivityOverlay(){
