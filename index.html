@@ -20,6 +20,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
   :root{
+    color-scheme: light;
     --bg: #F5F7F9;
     --card: #FFFFFF;
     --red: #C8232A;
@@ -41,6 +42,7 @@
     --shadow: 0 2px 4px rgba(0,0,0,0.05);
   }
   body.dark{
+    color-scheme: dark;
     --bg: #121212;
     --card: #1E1E1E;
     --red: #E14550;
@@ -176,8 +178,8 @@
   .list-card { background:var(--card); border-radius:var(--radius-lg); box-shadow:var(--shadow); overflow:hidden; margin-bottom:14px; }
   .list-row { display:flex; align-items:center; gap:12px; padding:14px 16px; border-bottom:1px solid var(--line); cursor:pointer; }
   .list-row:last-child { border-bottom:none; }
-  .list-row .lr-icon { width:36px; height:36px; border-radius:12px; background:var(--squircle-bg); display:flex; align-items:center; justify-content:center; font-size:15px; flex:none; }
-  .list-row .lr-icon img { width:26px; height:26px; object-fit:contain; }
+  .list-row .lr-icon { width:48px; height:48px; border-radius:12px; background:var(--squircle-bg); display:flex; align-items:center; justify-content:center; font-size:15px; flex:none; }
+  .list-row .lr-icon img { width:40px; height:40px; object-fit:contain; }
   .list-row .lr-mid { flex:1; min-width:0; }
   .list-row .lr-title { font-size:13.5px; font-weight:700; color:var(--ink); }
   .list-row .lr-sub { font-size:11px; color:var(--muted); margin-top:2px; }
@@ -218,7 +220,7 @@
   .accordion-body .ab-row .ab-w { color:var(--muted); }
   .empty-state { text-align:center; padding:40px 20px; }
   .empty-state .es-icon { font-size:34px; margin-bottom:10px; }
-  .empty-state img.es-icon { width:64px; height:64px; object-fit:contain; margin:0 auto 10px; display:block; }
+  .empty-state img.es-icon { width:150px; height:150px; object-fit:contain; margin:0 auto 12px; display:block; }
   .empty-state h3 { font-size:15px; margin:0 0 6px; }
   .empty-state p { font-size:12.5px; color:var(--muted); margin:0 0 16px; line-height:1.5; }
 
@@ -240,7 +242,7 @@
   .wrapped-hero { background:linear-gradient(160deg, #2a1a5e 0%, #7b2ff7 45%, #C8232A 100%); border-radius:var(--radius-lg);
     padding:30px 20px; text-align:center; color:#fff; margin-bottom:14px; }
   .wrapped-hero .wh-icon { font-size:44px; margin-bottom:10px; }
-  .wrapped-hero img.wh-icon { width:84px; height:84px; object-fit:contain; margin:0 auto 10px; display:block; }
+  .wrapped-hero img.wh-icon { width:220px; height:220px; object-fit:contain; margin:0 auto 14px; display:block; }
   .wrapped-hero .wh-tag { font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; opacity:0.8; margin-bottom:4px; }
   .wrapped-hero .wh-title { font-size:22px; font-weight:800; margin-bottom:8px; }
   .wrapped-hero .wh-body { font-size:13px; line-height:1.6; opacity:0.92; max-width:300px; margin:0 auto; }
@@ -257,7 +259,7 @@
   .passcode-body { display:flex; flex-direction:column; align-items:center; padding-top:calc(50px + env(safe-area-inset-top)); text-align:center; }
   .passcode-close { position:absolute; top:calc(14px + env(safe-area-inset-top)); left:14px; }
   .passcode-lock { font-size:34px; margin-bottom:10px; }
-  img.passcode-lock { width:72px; height:72px; object-fit:contain; margin:0 auto 10px; display:block; }
+  img.passcode-lock { width:150px; height:150px; object-fit:contain; margin:0 auto 12px; display:block; }
   .passcode-title { font-size:19px; font-weight:800; color:var(--ink); margin-bottom:6px; }
   .passcode-sub { font-size:12.5px; color:var(--muted); max-width:260px; line-height:1.5; margin-bottom:26px; }
   .passcode-dots { display:flex; gap:14px; margin-bottom:10px; }
@@ -272,9 +274,9 @@
   .passcode-demo-hint { font-size:10.5px; color:var(--muted); opacity:0.8; }
 
   /* ---------- ORDER RECEIPT ---------- */
-  .receipt-check { width:64px; height:64px; border-radius:50%; background:var(--green-tint); color:var(--green); font-size:30px; font-weight:800;
+  .receipt-check { width:130px; height:130px; border-radius:50%; background:var(--green-tint); color:var(--green); font-size:30px; font-weight:800;
     display:flex; align-items:center; justify-content:center; margin:10px auto 14px; }
-  .receipt-check img { width:44px; height:44px; object-fit:contain; }
+  .receipt-check img { width:104px; height:104px; object-fit:contain; }
   .receipt-headline { text-align:center; font-size:16px; font-weight:800; color:var(--ink); margin-bottom:16px; }
   .receipt-detail-card .mkd-info-row:last-child { border-bottom:none; }
   .receipt-detail-card .mkd-info-row { padding:8px 0; border-bottom:1px solid var(--line); }
@@ -332,6 +334,8 @@
   .holding-row-wrap.expanded .h-chevron { transform:rotate(90deg); }
   .holding-detail { display:none; background:var(--squircle-bg); border-radius:var(--radius); padding:4px 12px; margin:0 0 12px; }
   .holding-row-wrap.expanded .holding-detail { display:block; }
+  .holding-detail-actions { display:flex; gap:8px; padding:10px 0 12px; }
+  .holding-detail-actions .btn { flex:1; font-size:12.5px; padding:9px 8px; }
   .activity-row { display:flex; align-items:center; gap:11px; padding:11px 0; border-bottom:1px solid var(--line); }
   .activity-row:last-child { border-bottom:none; }
   .ar-side { width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; flex:none; font-size:14px; font-weight:800; color:#fff; }
@@ -382,7 +386,7 @@
   .more-row { display:flex; align-items:center; gap:12px; padding:14px 16px; cursor:pointer; border-bottom:1px solid var(--line); }
   .more-row:last-child { border-bottom:none; }
   .more-row .mr-icon { font-size:16px; width:22px; text-align:center; }
-  .more-row img.mr-icon { width:24px; height:24px; object-fit:contain; flex:none; }
+  .more-row img.mr-icon { width:38px; height:38px; object-fit:contain; flex:none; }
   .more-row .mr-label { flex:1; font-size:13.5px; font-weight:600; color:var(--ink); }
   .footer-note { text-align:center; font-size:10.5px; color:var(--muted); padding:16px 0 10px; line-height:1.6; }
   .dark-toggle { width:44px; height:26px; border-radius:100px; background:var(--squircle-bg); border:1.5px solid var(--line);
@@ -424,7 +428,7 @@
     justify-content:center; font-size:10.5px; font-weight:800; color:var(--ink); flex:none; }
   .mkt-row .mk-fav-btn { border:none; background:transparent; font-size:16px; cursor:pointer; flex:none; color:var(--line); padding:2px 4px; }
   .mkt-row .mk-fav-btn.active { color:#e0a930; }
-  .mkt-row .mk-fav-btn img { width:16px; height:16px; object-fit:contain; display:block; }
+  .mkt-row .mk-fav-btn img { width:22px; height:22px; object-fit:contain; display:block; }
   .mkt-row .mk-mid { flex:1; min-width:0; }
   .mkt-row .mk-sym { font-size:13px; font-weight:700; color:var(--ink); }
   .mkt-row .mk-name { font-size:10.5px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -448,10 +452,10 @@
   .mkd-price { font-size:26px; font-weight:800; color:var(--ink); }
   .mkd-chg { font-size:13px; font-weight:700; }
   .mkd-chg.pos { color:var(--green); } .mkd-chg.neg { color:var(--red); }
-  .mkd-star-btn { border:none; background:var(--squircle-bg); width:34px; height:34px; border-radius:50%; font-size:16px; cursor:pointer;
+  .mkd-star-btn { border:none; background:var(--squircle-bg); width:42px; height:42px; border-radius:50%; font-size:16px; cursor:pointer;
     color:var(--line); display:flex; align-items:center; justify-content:center; font-family:inherit; }
   .mkd-star-btn.active { color:#e0a930; }
-  .mkd-star-btn img { width:18px; height:18px; object-fit:contain; }
+  .mkd-star-btn img { width:26px; height:26px; object-fit:contain; }
   .tf-strip { display:flex; gap:4px; margin:10px 0 6px; }
   .tf-strip button { flex:1; border:none; background:transparent; padding:7px 2px; border-radius:var(--radius-sm); font-size:11.5px;
     font-weight:700; color:var(--muted); cursor:pointer; font-family:inherit; }
@@ -500,7 +504,7 @@
     background:linear-gradient(120deg, #2a1a5e 0%, #7b2ff7 55%, #C8232A 100%); color:#fff; display:flex; align-items:center;
     gap:10px; cursor:pointer; font-family:inherit; }
   .wrapped-teaser-btn .wt-icon { font-size:20px; flex:none; }
-  .wrapped-teaser-btn img.wt-icon { width:34px; height:34px; object-fit:contain; flex:none; }
+  .wrapped-teaser-btn img.wt-icon { width:60px; height:60px; object-fit:contain; flex:none; }
   .wrapped-teaser-btn .wt-text { flex:1; text-align:left; }
   .wrapped-teaser-btn .wt-title { font-size:13px; font-weight:800; }
   .wrapped-teaser-btn .wt-sub { font-size:10.5px; opacity:0.85; margin-top:1px; }
@@ -659,7 +663,9 @@
       <header class="simple-header">
         <div style="width:20px;"></div>
         <h1 id="portTitle" data-t="portTitle">Portfolio</h1>
-        <div style="width:20px;"></div>
+        <button class="hdr-icon" id="btnActivityIconPortfolio" aria-label="Activity">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"></path><path d="M3.05 13a9 9 0 106.36-9.36"></path><path d="M12 7v5l3 3"></path></svg>
+        </button>
       </header>
 
       <div class="benefit-card">
@@ -1905,7 +1911,7 @@ const STRINGS = {
     goalMaxHint:"คุณสามารถตั้งเป้าหมายได้สูงสุด 3 เป้าหมายต่อพอร์ต",
     moreWrappedTitle:"Wealth Wrapped ของคุณ",
     wrappedTeaserTitle:"ดู Wealth Wrapped ของคุณ",
-    wrappedTeaserSub:"สาย นักลงทุนของคุณ, DR อันดับต้น และอื่นๆ",
+    wrappedTeaserSub:"สไตล์นักลงทุนของคุณ, DR อันดับต้น และอื่นๆ",
     wrappedLoading1:"กำลังประมวลผลตัวเลขของคุณ…",
     wrappedLoading2:"กำลังค้นหาสไตล์นักลงทุนของคุณ…",
     wrappedLoading3:"กำลังตรวจสอบหลักทรัพย์ในพอร์ตของคุณ…",
@@ -1920,20 +1926,20 @@ const STRINGS = {
     receiptHeadlinePending:"คำสั่งจำกัดราคาสำหรับ {symbol} อยู่ระหว่างรอดำเนินการ",
     receiptSaveBtn:"บันทึกเป็นรูปใบเสร็จ",
     receiptBackBtn:"กลับสู่พอร์ต",
-    receiptSymbolLabel:"สัญลักษณ์", receiptSideLabel:"ประเภทคำสั่ง", receiptOrderTypeLabel:"ชนิดคำสั่ง",
+    receiptSymbolLabel:"สัญลักษณ์", receiptSideLabel:"ฝั่งคำสั่ง", receiptOrderTypeLabel:"ประเภทคำสั่ง",
     receiptQtyLabel:"จำนวนหน่วย", receiptPriceLabel:"ราคา", receiptTotalLabel:"ยอดรวม",
     receiptPortfolioLabel:"พอร์ต", receiptStatusLabel:"สถานะ", receiptDateLabel:"วันที่",
     holdDetailShares:"จำนวนหน่วย", holdDetailMarket:"ราคาตลาด", holdDetailAvgPrice:"ราคาทุนเฉลี่ย", holdDetailDayPnl:"กำไร/ขาดทุนวันนี้",
     wrappedTitle:"Wealth Wrapped",
     wrappedPeriodMonthly:"เดือนนี้", wrappedPeriodYearly:"ปีนี้",
     wrappedEmptyDesc:"ซื้อหรือสร้างพอร์ตก่อน แล้วค่อยกลับมาดู Wrapped ของคุณ",
-    wrappedYouAreLabel:"คุณลงทุนแบบสาย",
+    wrappedYouAreLabel:"คุณลงทุนแบบ",
     wrappedTopTitle:"DR ที่คุณลงทุนมากที่สุด",
     wrappedGoldenTitle:"วันทองของคุณ",
     wrappedGoldenBodyTemplate:"{symbol} ทำผลตอบแทนวันเดียวสูงสุดในช่วงนี้ที่ +{pct} — จังหวะดีไม่ว่าคุณจะสังเกตเห็นหรือไม่ก็ตาม",
     wrappedGoldenBodyEmpty:"เพิ่มหลักทรัพย์เพื่อดูวันที่ทำผลตอบแทนสูงสุดของคุณ",
     wrappedBenchmarkTitle:"คุณ vs ตลาด DR",
-    wrappedBenchmarkBodyAhead:"ผลตอบแทนคาดการณ์ของพอร์ตคุณสูงกว่าค่าเฉลี่ยของทุกธีม DR ในแอปนี้อยู่ {pct} ตำแหน่งที่ดีทีเดียว",
+    wrappedBenchmarkBodyAhead:"ผลตอบแทนคาดการณ์ของพอร์ตคุณสูงกว่าค่าเฉลี่ยของทุกธีม DR ในแอปนี้อยู่ {pct} — ตำแหน่งที่ดีทีเดียว",
     wrappedBenchmarkBodyBehind:"ผลตอบแทนคาดการณ์ของพอร์ตคุณต่ำกว่าค่าเฉลี่ยของทุกธีม DR ในแอปนี้อยู่ {pct} — สัดส่วนพอร์ตของคุณน่าจะเน้นความระมัดระวังมากกว่า ซึ่งก็ไม่ใช่เรื่องแย่",
     wrappedShareTitle:"แชร์ Wrapped ของคุณ",
     wrappedShareTopLabel:"หลักทรัพย์อันดับต้น",
@@ -1952,7 +1958,7 @@ const STRINGS = {
     wrappedPersonaBalancedName:"สาย Balanced Builder",
     wrappedPersonaBalancedBody:"คุณกระจายการลงทุนอย่างรอบคอบในหลายธีม แทนที่จะไล่ตามกระแสใดกระแสหนึ่ง มั่นคง กระจายความเสี่ยง และสร้างมาเพื่ออยู่ยาว",
     wrappedPersonaAllinName:"สาย All-In Maverick",
-    wrappedPersonaAllinBody:"DR ตัวเดียวครองพอร์ตของคุณเกือบทั้งหมด กล้าได้กล้าเสีย มั่นใจสูง และไม่ใช่สายที่ใจไม่นิ่งแน่นอน",
+    wrappedPersonaAllinBody:"DR ตัวเดียวครองพอร์ตของคุณเกือบทั้งหมด กล้าได้กล้าเสีย มั่นใจสูง และไม่ใช่สายที่ใจเสาะแน่นอน",
     wrappedPersonaSpaceName:"สาย Space Cadet",
     wrappedPersonaSpaceBody:"คุณมีสัดส่วนจริงในธุรกิจเศรษฐกิจอวกาศ ทั้งดาวเทียม การปล่อยจรวด และโครงสร้างพื้นฐานแห่งอนาคต คนส่วนใหญ่ยังไม่ทันคิดถึงเรื่องนี้ด้วยซ้ำ",
     wrappedPersonaCryptoName:"สาย Crypto Curious",
@@ -2852,6 +2858,17 @@ function fmtPctPlain(n){ return (n*100).toFixed(1) + '%'; }
 /* ============================== APP UI ============================== */
 function $(sel, root){ return (root||document).querySelector(sel); }
 function $all(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+// Chart.js doesn't know about our CSS theme vars, so its default axis text/gridline colors
+// (mid-gray) go low-contrast on the dark card background. Read the live --muted/--line values
+// so every chart's axis labels and gridlines adapt to whichever theme is active when it's built.
+function chartTextColor(){
+  const v = getComputedStyle(document.body).getPropertyValue('--muted').trim();
+  return v || '#888888';
+}
+function chartGridColor(){
+  const v = getComputedStyle(document.body).getPropertyValue('--line').trim();
+  return v || '#ECEEF1';
+}
 
 const BUILD_OWN_DEFAULT_LUMPSUM = 10000;
 const BUILD_OWN_DEFAULT_MONTHLY = 2000;
@@ -3279,7 +3296,7 @@ function renderMarketDetail(){
       borderColor: series.changePct>=0 ? '#1F8A4D' : '#C8232A',
       backgroundColor: series.changePct>=0 ? 'rgba(31,138,77,0.08)' : 'rgba(200,35,42,0.08)',
       fill:true, pointRadius:0, borderWidth:2, tension:0.15 }] },
-    options:{ maintainAspectRatio:false, scales:{ x:{ display:false }, y:{ ticks:{ callback:(v)=>fmtBaht(v) } } },
+    options:{ maintainAspectRatio:false, scales:{ x:{ display:false }, y:{ ticks:{ color:chartTextColor(), callback:(v)=>fmtBaht(v) }, grid:{ color:chartGridColor() } } },
       plugins:{ legend:{ display:false } } }
   });
 
@@ -3339,7 +3356,7 @@ function renderBsChart(){
       borderColor: series.changePct>=0 ? '#1F8A4D' : '#C8232A',
       backgroundColor: series.changePct>=0 ? 'rgba(31,138,77,0.08)' : 'rgba(200,35,42,0.08)',
       fill:true, pointRadius:0, borderWidth:2, tension:0.15 }] },
-    options:{ maintainAspectRatio:false, scales:{ x:{ display:false }, y:{ ticks:{ callback:(v)=>fmtBaht(v) } } },
+    options:{ maintainAspectRatio:false, scales:{ x:{ display:false }, y:{ ticks:{ color:chartTextColor(), callback:(v)=>fmtBaht(v) }, grid:{ color:chartGridColor() } } },
       plugins:{ legend:{ display:false } } }
   });
 }
@@ -3417,7 +3434,7 @@ function buildExpandableHoldingRow(h){
   const row = document.createElement('div'); row.className = 'holding-row';
   row.innerHTML = '<div class="h-avatar">'+h.underlyingSymbol.slice(0,3)+'</div>' +
     '<div class="h-mid"><div class="h-sym">'+h.symbol+'</div><div class="h-bucket">'+h.qty.toLocaleString('en-US')+' '+T('portQtyLabel').toLowerCase()+' · '+T('portAvgCostLabel')+' '+fmtBahtPrice(h.avgCostTHB)+'</div></div>' +
-    '<div class="h-right"><div class="h-weight">'+fmtBaht(h.valueTHB)+'</div><div class="h-ret" style="color:'+(pnlPos?'#1F8A4D':'#C8232A')+'">'+(pnlPos?'+':'')+fmtBaht(h.pnlTHB)+' ('+fmtPct(h.pnlPct)+')</div></div>' +
+    '<div class="h-right"><div class="h-weight">'+fmtBaht(h.valueTHB)+'</div><div class="h-ret" style="color:'+(pnlPos?'var(--green)':'var(--red)')+'">'+(pnlPos?'+':'')+fmtBaht(h.pnlTHB)+' ('+fmtPct(h.pnlPct)+')</div></div>' +
     '<div class="h-chevron">›</div>';
   const detail = document.createElement('div'); detail.className = 'holding-detail';
   wrap.appendChild(row); wrap.appendChild(detail);
@@ -3436,7 +3453,13 @@ function buildExpandableHoldingRow(h){
         [T('holdDetailAvgPrice'), fmtBahtPrice(h.avgCostTHB)],
         [T('holdDetailDayPnl'), (dayPos?'+':'')+fmtBaht(dayAmt)+' ('+fmtPct(dayPct)+')']
       ];
-      detail.innerHTML = rows.map(([l,v])=>'<div class="mkd-info-row"><span class="mir-label">'+l+'</span><span class="mir-value">'+v+'</span></div>').join('');
+      detail.innerHTML = rows.map(([l,v])=>'<div class="mkd-info-row"><span class="mir-label">'+l+'</span><span class="mir-value">'+v+'</span></div>').join('') +
+        '<div class="holding-detail-actions">' +
+          '<button class="btn primary hd-buy-btn">'+T('mkBuyBtn')+'</button>' +
+          '<button class="btn sell hd-sell-btn">'+T('mkSellBtn')+'</button>' +
+        '</div>';
+      detail.querySelector('.hd-buy-btn').onclick = (e)=>{ e.stopPropagation(); openBuySell(h.symbol, 'buy'); };
+      detail.querySelector('.hd-sell-btn').onclick = (e)=>{ e.stopPropagation(); openBuySell(h.symbol, 'sell'); };
       detail.dataset.filled = '1';
     }
   };
@@ -4091,8 +4114,9 @@ function renderCompare(){
       { label:T('portCompareOverseasLabel'), data:osSeries, borderColor:'#9aa4b5', borderDash:[4,3], fill:false, pointRadius:0, borderWidth:1.75, tension:0.2 }
     ]},
     options:{ maintainAspectRatio:false,
-      scales:{ x:{ title:{ display:true, text: LANG==='th'?'ปี':'Years' } }, y:{ ticks:{ callback:(v)=>fmtBaht(v) } } },
-      plugins:{ legend:{ display:true, labels:{ boxWidth:10, font:{ size:10 } } } } }
+      scales:{ x:{ title:{ display:true, text: LANG==='th'?'ปี':'Years', color:chartTextColor() }, ticks:{ color:chartTextColor() }, grid:{ color:chartGridColor() } },
+        y:{ ticks:{ color:chartTextColor(), callback:(v)=>fmtBaht(v) }, grid:{ color:chartGridColor() } } },
+      plugins:{ legend:{ display:true, labels:{ boxWidth:10, font:{ size:10 }, color:chartTextColor() } } } }
   });
   $('#compareCostValue').textContent = fmtBaht(benefitCostDiff(months));
   const rows = [
@@ -4573,8 +4597,8 @@ function drawWrappedShareCard(persona, top3, portReturn){
 
   const personaIconImg = new Image();
   personaIconImg.onload = ()=>{
-    const size = 220;
-    if (ctx.drawImage) ctx.drawImage(personaIconImg, w/2 - size/2, 190, size, size);
+    const size = 320;
+    if (ctx.drawImage) ctx.drawImage(personaIconImg, w/2 - size/2, 130, size, size);
   };
   personaIconImg.src = persona.icon;
 
@@ -4648,6 +4672,7 @@ function wireWealthWrapped(){
 
 function wireActivityOverlay(){
   $('#btnActivityIcon').onclick = openActivity;
+  if ($('#btnActivityIconPortfolio')) $('#btnActivityIconPortfolio').onclick = openActivity;
   $('#btnCloseActivity').onclick = ()=> closeOverlay('overlay-activity');
   $all('#activityPortToggle button').forEach(b=>{
     b.onclick = ()=>{ state.txFilter.view = b.dataset.view; state.txFilter.month = 'all'; renderActivityList(); };
@@ -5005,8 +5030,9 @@ function renderResultsProjection(f){
       { label:T('projP10'), data:p10, borderColor:'rgba(200,35,42,0)', backgroundColor:'rgba(200,35,42,0.10)', fill:false, pointRadius:0, tension:0.25 }
     ]},
     options:{ maintainAspectRatio:false,
-      scales:{ x:{ title:{ display:true, text: LANG==='th'?'ปี':'Years' } }, y:{ ticks:{ callback:(v)=>fmtBaht(v) } } },
-      plugins:{ legend:{ display:true, labels:{ boxWidth:10, font:{ size:10 } } } }
+      scales:{ x:{ title:{ display:true, text: LANG==='th'?'ปี':'Years', color:chartTextColor() }, ticks:{ color:chartTextColor() }, grid:{ color:chartGridColor() } },
+        y:{ ticks:{ color:chartTextColor(), callback:(v)=>fmtBaht(v) }, grid:{ color:chartGridColor() } } },
+      plugins:{ legend:{ display:true, labels:{ boxWidth:10, font:{ size:10 }, color:chartTextColor() } } }
     }
   });
 }
@@ -5030,8 +5056,9 @@ function renderResultsBacktest(f){
       { label: LANG==='th'?'เงินลงทุนสะสม':'Total contributed', data:contributed, borderColor:'#9aa4b5', borderDash:[4,3], fill:false, pointRadius:0, borderWidth:1.75, tension:0 }
     ]},
     options:{ maintainAspectRatio:false,
-      scales:{ x:{ title:{ display:true, text: LANG==='th'?'ปี':'Years' } }, y:{ ticks:{ callback:(v)=>fmtBaht(v) } } },
-      plugins:{ legend:{ display:true, labels:{ boxWidth:10, font:{ size:10 } } } }
+      scales:{ x:{ title:{ display:true, text: LANG==='th'?'ปี':'Years', color:chartTextColor() }, ticks:{ color:chartTextColor() }, grid:{ color:chartGridColor() } },
+        y:{ ticks:{ color:chartTextColor(), callback:(v)=>fmtBaht(v) }, grid:{ color:chartGridColor() } } },
+      plugins:{ legend:{ display:true, labels:{ boxWidth:10, font:{ size:10 }, color:chartTextColor() } } }
     }
   });
 }
