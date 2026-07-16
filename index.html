@@ -166,7 +166,7 @@
 
   .market-strip { display:flex; gap:10px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
   .market-strip::-webkit-scrollbar{ display:none; }
-  .market-card { flex:none; width:118px; background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:12px; }
+  .market-card { flex:none; width:118px; background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:12px; cursor:pointer; }
   .market-card .mc-name { font-size:11px; font-weight:700; color:var(--muted); margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .market-card .mc-price { font-size:14.5px; font-weight:800; color:var(--ink); }
   .market-card .mc-chg { font-size:11px; font-weight:700; margin-top:3px; }
@@ -384,6 +384,10 @@
   .ar-status.pending { color:var(--amber); }
   .chart-wrap { position:relative; height:190px; margin:8px 0 4px; }
   .chart-wrap.tall { height:210px; }
+  /* Lets a finger-drag across a chart scrub it (crosshair follows continuously) instead of the
+     browser hijacking the vertical component of the gesture to scroll the page -- same reason
+     Yahoo Finance/Robinhood charts don't scroll the page while you're dragging on them. */
+  .chart-wrap canvas { touch-action: none; }
   .chart-wrap.donut { height:190px; }
   .risk-gauge { padding:10px 4px 2px; }
   .risk-gauge .rg-track { position:relative; height:8px; border-radius:100px;
@@ -810,7 +814,7 @@
             <span class="wt-arrow">›</span>
           </button>
           <div class="port-action-row">
-            <button class="btn ghost port-action-btn" id="btnOptimize-simulated" data-t="optimizeBtn">Optimize portfolio</button>
+            <button class="btn ghost port-action-btn" id="btnRePlan-simulated" data-t="rebuildLink">Rebuild my portfolio</button>
             <button class="btn ghost port-action-btn" id="btnSchedule-simulated" data-t="scheduleBtn">Schedule</button>
           </div>
 
@@ -905,7 +909,6 @@
             <span class="wt-arrow">›</span>
           </button>
           <div class="port-action-row">
-            <button class="btn ghost port-action-btn" id="btnOptimize-actual" data-t="optimizeBtn">Optimize portfolio</button>
             <button class="btn ghost port-action-btn" id="btnSchedule-actual" data-t="scheduleBtn">Schedule</button>
           </div>
 
@@ -1264,6 +1267,25 @@
     <div class="mkd-actionbar">
       <button class="btn primary" id="mdBuyBtn" data-t="mkBuyBtn">Buy</button>
       <button class="btn sell" id="mdSellBtn" data-t="mkSellBtn">Sell</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay-index-detail">
+    <div class="overlay-header">
+      <button class="overlay-close" id="btnCloseIndexDetail">‹</button>
+      <div class="mkd-head-row" style="flex:1; justify-content:center; text-align:center;">
+        <span class="mkd-sym" id="idxName">–</span>
+      </div>
+      <div style="width:30px;"></div>
+    </div>
+    <div class="overlay-body">
+      <div class="mkd-price-row">
+        <span class="mkd-price" id="idxPrice">–</span>
+        <span class="mkd-chg" id="idxChg">–</span>
+      </div>
+      <div class="tf-strip" id="idxTfStrip"></div>
+      <div class="chart-wrap tall"><canvas id="idxChart"></canvas></div>
+      <p class="hint" id="idxHint" style="margin-top:10px;"></p>
     </div>
   </div>
 
@@ -1630,53 +1652,6 @@
     </div>
   </div>
 
-  <div class="overlay" id="overlay-optimize">
-    <div class="overlay-header">
-      <button class="overlay-close" id="btnCloseOptimize">‹</button>
-      <h1 data-t="optimizeTitle">Optimize portfolio</h1>
-      <div style="width:30px;"></div>
-    </div>
-    <div class="overlay-body">
-      <p class="hint" data-t="optimizeSub"></p>
-      <div id="optimizeEmpty" class="card empty-state" style="display:none;">
-        <div class="es-icon">◈</div>
-        <p data-t="optimizeEmptyDesc">Buy or build a portfolio first, then come back to optimize it.</p>
-      </div>
-      <div id="optimizeIntro">
-        <div class="card">
-          <label class="form-label" data-t="optimizeQ1Label">Risk comfort (1 = very cautious, 5 = very aggressive)</label>
-          <div class="tf-strip" id="optimizeRiskChips"></div>
-          <label class="form-label" data-t="optimizeQ2Label">Investment horizon (years)</label>
-          <input type="number" min="1" max="30" id="optimizeHorizonInput" class="form-input" value="5">
-          <button class="btn primary" id="optimizeStartBtn" style="margin-top:14px;" data-t="optimizeStartBtn">Show optimized portfolio</button>
-        </div>
-      </div>
-      <div id="optimizeResult" style="display:none;">
-        <div class="nav-split-card">
-          <div class="split-half">
-            <div class="sh-label" data-t="optimizeCurrentLabel">Current portfolio</div>
-            <div class="sh-value" id="optCurrentRet">–</div>
-            <div class="sh-sub" id="optCurrentDD">–</div>
-          </div>
-          <div class="split-half">
-            <div class="sh-label" data-t="optimizeNewLabel">Optimized portfolio</div>
-            <div class="sh-value" id="optNewRet">–</div>
-            <div class="sh-sub" id="optNewDD">–</div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="section-title" data-t="allocTitle">Allocation by sleeve</div>
-          <div id="optLegendCol"></div>
-        </div>
-        <div class="card" style="padding:16px 16px 4px;">
-          <div class="section-title" data-t="optimizeHoldingsTitle">Optimized holdings</div>
-          <div id="optHoldingsList"></div>
-        </div>
-        <button class="btn ghost" id="optimizeRedoBtn" style="margin-top:12px;" data-t="optimizeRedoBtn">Answer again</button>
-      </div>
-    </div>
-  </div>
-
   <div class="overlay" id="overlay-news-detail">
     <div class="overlay-header">
       <button class="overlay-close" id="btnCloseNewsDetail">‹</button>
@@ -1755,7 +1730,7 @@ const STRINGS = {
     activityEmptyDesc:"No orders yet.",
     activityStatusPending:"Pending",
     activityStatusExecuted:"Executed",
-    optimizeBtn:"Optimize portfolio", scheduleBtn:"Schedule",
+    scheduleBtn:"Schedule",
     scheduleTitle:"Auto-invest (DCA)",
     scheduleSub:"Automatically buy a fixed amount of a DR01 every month.",
     scheduleNewTitle:"New auto-invest plan",
@@ -1772,20 +1747,6 @@ const STRINGS = {
     scheduleOngoing:"Ongoing",
     scheduleOrdersLabel:"orders",
     scheduleMonthShort:"mo",
-    optimizeTitle:"Optimize portfolio",
-    optimizeSub:"Answer two quick questions and we'll suggest a rebalanced mix based on your risk appetite and time horizon.",
-    optimizeEmptyDesc:"Buy or build a portfolio first, then come back to optimize it.",
-    optimizeStartBtn:"Answer 2 quick questions",
-    optimizeRedoBtn:"Answer again",
-    optimizeCurrentLabel:"Current — est. 1yr return / max drawdown",
-    optimizeNewLabel:"Optimized — est. 1yr return / max drawdown",
-    optimizeHoldingsTitle:"Optimized holdings",
-    optimizeQ1:"On a scale of 1 (very cautious) to 5 (very aggressive), how much risk are you comfortable with?",
-    optimizeQ2:"How many years is your investment horizon?",
-    optimizeQ1Label:"Risk comfort (1 = very cautious, 5 = very aggressive)",
-    optimizeQ2Label:"Investment horizon (years)",
-    optimizeNeedHoldings:"You need at least one holding in this portfolio before it can be optimized.",
-    optimizeDDLabel:"Max drawdown (10yr):",
     bsAvailableToSell:"Available to sell",
     bsTargetLabel:"Add this trade to", bsTargetNewSimHint:"You don't have a Simulated portfolio yet — this trade will start one for you.",
 
@@ -1836,6 +1797,7 @@ const STRINGS = {
     receiptPortfolioLabel:"Portfolio", receiptStatusLabel:"Status", receiptDateLabel:"Date",
     holdDetailShares:"Shares", holdDetailMarket:"Market price", holdDetailAvgPrice:"Avg price", holdDetailDayPnl:"1-day P&L",
     holdDetailWeight:"Weight", holdDetailValue:"Value",
+    idxDetailHint:"This is a market benchmark, not a DR you can trade directly — but similar exposure is available through several DR01s in this app.",
     wrappedTitle:"Wealth Wrapped",
     wrappedPeriodMonthly:"This month", wrappedPeriodYearly:"This year",
     wrappedEmptyDesc:"Buy or build a portfolio first, then come back for your Wrapped.",
@@ -2012,6 +1974,7 @@ const STRINGS = {
     moreDarkMode:"Dark mode",
     moreLanguage:"Language", moreAboutTitle:"About the DR01 Portfolio Builder", moreMethodologyTitle:"Methodology & assumptions", moreResetTitle:"Reset my plan",
     moreResetAllTitle:"Reset all", resetAllConfirm:"This will reset the entire app back to its starting state — your Actual portfolio, Simulated portfolio, favorites, and settings will all be cleared. Continue?",
+    confirmReplaceSimPortfolio:"This will replace your current Simulated portfolio with the new one you're about to build. Continue?",
 
     newsTitle:"News", newsReadMore:"Read", newsBackToList:"Back to News",
   },
@@ -2067,7 +2030,7 @@ const STRINGS = {
     activityEmptyDesc:"ยังไม่มีคำสั่งซื้อขาย",
     activityStatusPending:"รอดำเนินการ",
     activityStatusExecuted:"สำเร็จ",
-    optimizeBtn:"ปรับพอร์ตให้เหมาะสม", scheduleBtn:"ตั้งเวลา",
+    scheduleBtn:"ตั้งเวลา",
     scheduleTitle:"ลงทุนอัตโนมัติ (DCA)",
     scheduleSub:"ซื้อ DR01 ที่กำหนดเป็นจำนวนเงินคงที่โดยอัตโนมัติทุกเดือน",
     scheduleNewTitle:"สร้างแผนลงทุนอัตโนมัติใหม่",
@@ -2084,20 +2047,6 @@ const STRINGS = {
     scheduleOngoing:"ต่อเนื่อง",
     scheduleOrdersLabel:"ครั้ง",
     scheduleMonthShort:"เดือน",
-    optimizeTitle:"ปรับพอร์ตให้เหมาะสม",
-    optimizeSub:"ตอบ 2 คำถามสั้นๆ เพื่อรับคำแนะนำการปรับสัดส่วนพอร์ตตามระดับความเสี่ยงและระยะเวลาการลงทุนของคุณ",
-    optimizeEmptyDesc:"ซื้อหรือสร้างพอร์ตก่อน แล้วค่อยกลับมาปรับให้เหมาะสม",
-    optimizeStartBtn:"ตอบ 2 คำถามสั้นๆ",
-    optimizeRedoBtn:"ตอบคำถามอีกครั้ง",
-    optimizeCurrentLabel:"ปัจจุบัน — ผลตอบแทนคาดการณ์ 1 ปี / ขาดทุนสูงสุด",
-    optimizeNewLabel:"หลังปรับ — ผลตอบแทนคาดการณ์ 1 ปี / ขาดทุนสูงสุด",
-    optimizeHoldingsTitle:"หลักทรัพย์ในพอร์ตที่ปรับแล้ว",
-    optimizeQ1:"ในระดับ 1 (ระมัดระวังมาก) ถึง 5 (เสี่ยงสูงมาก) คุณรับความเสี่ยงได้แค่ไหน?",
-    optimizeQ2:"ระยะเวลาการลงทุนของคุณกี่ปี?",
-    optimizeQ1Label:"ระดับความเสี่ยงที่รับได้ (1 = ระมัดระวังมาก, 5 = เสี่ยงสูงมาก)",
-    optimizeQ2Label:"ระยะเวลาการลงทุน (ปี)",
-    optimizeNeedHoldings:"คุณต้องมีหลักทรัพย์อย่างน้อย 1 รายการในพอร์ตนี้ก่อนจึงจะปรับให้เหมาะสมได้",
-    optimizeDDLabel:"ขาดทุนสูงสุด (10 ปี):",
     bsTargetLabel:"เพิ่มคำสั่งนี้ลงใน", bsTargetNewSimHint:"คุณยังไม่มีพอร์ตจำลอง — คำสั่งนี้จะเริ่มสร้างพอร์ตจำลองให้คุณโดยอัตโนมัติ",
     bsAvailableToSell:"จำนวนที่ขายได้",
 
@@ -2148,6 +2097,7 @@ const STRINGS = {
     receiptPortfolioLabel:"พอร์ต", receiptStatusLabel:"สถานะ", receiptDateLabel:"วันที่",
     holdDetailShares:"จำนวนหน่วย", holdDetailMarket:"ราคาตลาด", holdDetailAvgPrice:"ราคาทุนเฉลี่ย", holdDetailDayPnl:"กำไร/ขาดทุนวันนี้",
     holdDetailWeight:"น้ำหนัก", holdDetailValue:"มูลค่า",
+    idxDetailHint:"นี่คือดัชนีอ้างอิงตลาด ไม่ใช่ DR ที่คุณสามารถซื้อขายได้โดยตรง แต่คุณสามารถลงทุนในสินทรัพย์ใกล้เคียงได้ผ่าน DR01 หลายตัวในแอปนี้",
     wrappedTitle:"Wealth Wrapped",
     wrappedPeriodMonthly:"เดือนนี้", wrappedPeriodYearly:"ปีนี้",
     wrappedEmptyDesc:"ซื้อหรือสร้างพอร์ตก่อน แล้วค่อยกลับมาดู Wrapped ของคุณ",
@@ -2324,6 +2274,7 @@ const STRINGS = {
     moreDarkMode:"โหมดมืด",
     moreLanguage:"ภาษา", moreAboutTitle:"เกี่ยวกับ DR01 Portfolio Builder", moreMethodologyTitle:"วิธีการคำนวณ & สมมติฐาน", moreResetTitle:"เริ่มแผนใหม่",
     moreResetAllTitle:"รีเซ็ตทั้งหมด", resetAllConfirm:"การดำเนินการนี้จะรีเซ็ตแอปทั้งหมดกลับสู่ค่าเริ่มต้น — พอร์ตจริง พอร์ตจำลอง รายการโปรด และการตั้งค่าทั้งหมดจะถูกล้าง ต้องการดำเนินการต่อหรือไม่?",
+    confirmReplaceSimPortfolio:"การดำเนินการนี้จะแทนที่พอร์ตจำลองปัจจุบันของคุณด้วยพอร์ตใหม่ที่คุณกำลังจะสร้าง ต้องการดำเนินการต่อหรือไม่?",
 
     newsTitle:"ข่าว", newsReadMore:"อ่านต่อ", newsBackToList:"กลับไปหน้าข่าว",
   }
@@ -2997,6 +2948,38 @@ function genPriceSeries(u, timeframe){
   return { timeframe, prices, changeAbs, changePct };
 }
 
+// Macro indices shown on the Home market strip (S&P 500, Hang Seng, Nasdaq, Gold, US 10Y Yield)
+// aren't DR tickers -- they're not in UNIVERSE and have no mu/sigma of their own -- so they get their
+// own illustrative drift/vol assumptions per asset class, keyed by MARKET_DATA's "key" field.
+const INDEX_STATS = {
+  sp500:   { mu:0.09, sigma:0.16 },
+  hsi:     { mu:0.06, sigma:0.22 },
+  nasdaq:  { mu:0.11, sigma:0.20 },
+  gold:    { mu:0.05, sigma:0.14 },
+  bond10y: { mu:0.01, sigma:0.05 } // a yield, not a price -- much smaller relative moves
+};
+// Same synthetic-random-walk technique as genPriceSeries(), scaled to the index's own current level
+// (points for equities, $ for gold, % for the yield) instead of a DR's THB NAV.
+function genIndexPriceSeries(m, timeframe){
+  const cfg = TIMEFRAME_CONFIG[timeframe] || TIMEFRAME_CONFIG['1M'];
+  const stats = INDEX_STATS[m.key] || { mu:0.08, sigma:0.16 };
+  const rng = mulberry32(hashStr(m.key + '-index-series-' + timeframe));
+  const n = cfg.points;
+  const stepMu = stats.mu / cfg.stepsPerYear;
+  const stepSigma = stats.sigma / Math.sqrt(cfg.stepsPerYear);
+  const raw = [1];
+  for (let i=1;i<=n;i++){
+    const shock = seededNormal(rng);
+    const r = (stepMu - 0.5*stepSigma*stepSigma) + stepSigma*shock;
+    raw.push(raw[i-1]*Math.exp(r));
+  }
+  const scale = m.price / raw[n];
+  const prices = raw.map(v=>v*scale);
+  const changeAbs = prices[n] - prices[0];
+  const changePct = prices[0] > 0 ? changeAbs/prices[0] : 0;
+  return { timeframe, prices, changeAbs, changePct };
+}
+
 // short "today" path used for list-row sparklines + the day's %/price move (Markets list, Home ticker strip)
 function genSparkline(u){
   const s = genPriceSeries(u, '1D');
@@ -3118,6 +3101,59 @@ function chartGridColor(){
   return v || '#ECEEF1';
 }
 
+// Yahoo-Finance-style chart interactivity, shared by every line chart in the app (Market/Index
+// detail, Buy/Sell ticket, Compare, Planner projection + backtest). Two parts:
+//   1. This plugin draws a vertical dashed "crosshair" guide at whatever point Chart.js's own
+//      hover/interaction logic currently has active -- it doesn't need its own event handling,
+//      it just reads chart.getActiveElements() (populated by Chart.js core) on every redraw.
+//   2. chartInteractionOptions()/chartHoverPointStyle() below are mixed into each chart's config
+//      so that (a) the nearest point along X keeps updating continuously as you drag/hover, rather
+//      than requiring you to land exactly on a point, and (b) a dot appears at the active point even
+//      though these charts hide points at rest (pointRadius:0) for a clean line-only look.
+// touch-action:none on .chart-wrap canvas (see CSS) stops the browser from hijacking a vertical
+// finger-drag over the chart as a page-scroll, so touch devices can scrub left/right like a real
+// stock app instead of the page scrolling out from under your finger.
+const chartCrosshairPlugin = {
+  id: 'chartCrosshair',
+  afterDraw(chart){
+    const active = chart.getActiveElements && chart.getActiveElements();
+    if (!active || !active.length) return;
+    const { ctx, chartArea } = chart;
+    if (!chartArea) return;
+    const x = active[0].element.x;
+    ctx.save();
+    ctx.beginPath();
+    ctx.setLineDash([4,4]);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = chartGridColor();
+    ctx.moveTo(x, chartArea.top);
+    ctx.lineTo(x, chartArea.bottom);
+    ctx.stroke();
+    ctx.restore();
+  }
+};
+if (typeof Chart !== 'undefined' && Chart.register) Chart.register(chartCrosshairPlugin);
+function chartInteractionOptions(){
+  return { mode:'index', intersect:false };
+}
+// Spread into a dataset alongside pointRadius:0 -- keeps the resting line clean but shows a
+// filled dot at the active/dragged point, colored to match the given line color.
+function chartHoverPointStyle(color){
+  return { pointHoverRadius:5, pointHoverBackgroundColor:color, pointHoverBorderColor:'#fff', pointHoverBorderWidth:2 };
+}
+function chartTooltipOptions(valueFormatter){
+  return {
+    enabled: true,
+    mode: 'index',
+    intersect: false,
+    callbacks: {
+      // Keep the "Dataset name: " prefix Chart.js normally shows when a chart has multiple series
+      // (e.g. the P90/P50/P10 projection bands), but reuse our own baht formatting for the value.
+      label: (ctx)=> (ctx.dataset.label ? ctx.dataset.label+': ' : '') + valueFormatter(ctx.parsed.y)
+    }
+  };
+}
+
 const BUILD_OWN_DEFAULT_LUMPSUM = 10000;
 const BUILD_OWN_DEFAULT_MONTHLY = 2000;
 const COMPARE_LUMPSUM = 100000;
@@ -3168,7 +3204,9 @@ const state = {
   newsDetailIdx: null,
   wrappedView: 'actual',
   wrappedPeriod: 'monthly',
-  wrappedColorway: 'navy'
+  wrappedColorway: 'navy',
+  selectedIndexKey: null,
+  selectedIndexTimeframe: '1D'
 };
 const charts = {};
 
@@ -3254,11 +3292,12 @@ function renderGreeting(){
 function renderMarketStrip(){
   const wrap = $('#marketStrip'); wrap.innerHTML = '';
   MARKET_DATA.forEach(m=>{
-    const priceStr = m.isYield ? m.price.toFixed(2)+'%' : (m.priceUnit||'') + m.price.toLocaleString('en-US',{minimumFractionDigits: m.price<100?2:0, maximumFractionDigits: m.price<100?2:0});
+    const priceStr = fmtIndexValue(m, m.price);
     const posNeg = m.chgPct >= 0 ? 'pos' : 'neg';
     const el = document.createElement('div'); el.className='market-card';
     el.innerHTML = '<div class="mc-name">'+m.name+'</div><div class="mc-price">'+priceStr+'</div>' +
       '<div class="mc-chg '+posNeg+'">'+(m.chgPct>=0?'+':'')+m.chgPct.toFixed(2)+'%</div>';
+    el.onclick = ()=> openIndexDetail(m.key);
     wrap.appendChild(el);
   });
 }
@@ -3608,16 +3647,18 @@ function renderMarketDetail(){
     tfWrap.appendChild(b);
   });
 
+  const mdLineColor = series.changePct>=0 ? '#1F8A4D' : '#C8232A';
   const labels = series.prices.map(()=>'');
   if (charts.mdChart) charts.mdChart.destroy();
   charts.mdChart = new Chart($('#mdChart').getContext('2d'), {
     type:'line',
     data:{ labels, datasets:[{ data: series.prices.map(p=>Math.round(p*100)/100),
-      borderColor: series.changePct>=0 ? '#1F8A4D' : '#C8232A',
+      borderColor: mdLineColor,
       backgroundColor: series.changePct>=0 ? 'rgba(31,138,77,0.08)' : 'rgba(200,35,42,0.08)',
-      fill:true, pointRadius:0, borderWidth:2, tension:0.15 }] },
-    options:{ maintainAspectRatio:false, scales:{ x:{ display:false }, y:{ ticks:{ color:chartTextColor(), callback:(v)=>fmtBaht(v) }, grid:{ color:chartGridColor() } } },
-      plugins:{ legend:{ display:false } } }
+      fill:true, pointRadius:0, borderWidth:2, tension:0.15, ...chartHoverPointStyle(mdLineColor) }] },
+    options:{ maintainAspectRatio:false, interaction:chartInteractionOptions(),
+      scales:{ x:{ display:false }, y:{ ticks:{ color:chartTextColor(), callback:(v)=>fmtBaht(v) }, grid:{ color:chartGridColor() } } },
+      plugins:{ legend:{ display:false }, tooltip:chartTooltipOptions(fmtBahtPrice) } }
   });
 
   const rows = [
@@ -3639,6 +3680,63 @@ function renderMarketDetail(){
 }
 function wireMarketDetailOverlay(){
   $('#btnCloseMarketDetail').onclick = ()=> closeOverlay('overlay-market-detail');
+}
+
+/* ---------------------------------------------------------------- */
+/* HOME: INDEX DETAIL (S&P 500, Hang Seng, Nasdaq, Gold, US 10Y Yield)*/
+/* ---------------------------------------------------------------- */
+// Formats an index's own native unit -- points for equities, $ for gold, % for the yield --
+// instead of assuming everything is a THB DR price like fmtBahtPrice() does.
+function fmtIndexValue(m, v){
+  if (m.isYield) return v.toFixed(2)+'%';
+  return (m.priceUnit||'') + v.toLocaleString('en-US',{minimumFractionDigits: v<100?2:0, maximumFractionDigits: v<100?2:0});
+}
+function openIndexDetail(key){
+  const m = MARKET_DATA.find(x=>x.key===key);
+  if (!m) return;
+  state.selectedIndexKey = key;
+  state.selectedIndexTimeframe = '1D';
+  renderIndexDetail();
+  openOverlay('overlay-index-detail');
+}
+function renderIndexDetail(){
+  const m = MARKET_DATA.find(x=>x.key===state.selectedIndexKey);
+  if (!m) return;
+  $('#idxName').textContent = m.name;
+  $('#idxPrice').textContent = fmtIndexValue(m, m.price);
+
+  const tfWrap = $('#idxTfStrip'); tfWrap.innerHTML = '';
+  TIMEFRAMES.forEach(tf=>{
+    const b = document.createElement('button');
+    b.textContent = tf;
+    b.className = state.selectedIndexTimeframe===tf ? 'active' : '';
+    b.onclick = ()=>{ state.selectedIndexTimeframe = tf; renderIndexDetail(); };
+    tfWrap.appendChild(b);
+  });
+
+  const series = genIndexPriceSeries(m, state.selectedIndexTimeframe);
+  const posNeg = series.changePct >= 0 ? 'pos' : 'neg';
+  $('#idxChg').className = 'mkd-chg '+posNeg;
+  $('#idxChg').textContent = fmtPct(series.changePct) + ' (' + state.selectedIndexTimeframe + ')';
+
+  const idxLineColor = series.changePct>=0 ? '#1F8A4D' : '#C8232A';
+  const labels = series.prices.map(()=>'');
+  if (charts.idxChart) charts.idxChart.destroy();
+  charts.idxChart = new Chart($('#idxChart').getContext('2d'), {
+    type:'line',
+    data:{ labels, datasets:[{ data: series.prices.map(p=>Math.round(p*100)/100),
+      borderColor: idxLineColor,
+      backgroundColor: series.changePct>=0 ? 'rgba(31,138,77,0.08)' : 'rgba(200,35,42,0.08)',
+      fill:true, pointRadius:0, borderWidth:2, tension:0.15, ...chartHoverPointStyle(idxLineColor) }] },
+    options:{ maintainAspectRatio:false, interaction:chartInteractionOptions(),
+      scales:{ x:{ display:false }, y:{ ticks:{ color:chartTextColor(), callback:(v)=>fmtIndexValue(m,v) }, grid:{ color:chartGridColor() } } },
+      plugins:{ legend:{ display:false }, tooltip:chartTooltipOptions((v)=>fmtIndexValue(m,v)) } }
+  });
+
+  $('#idxHint').textContent = T('idxDetailHint');
+}
+function wireIndexDetailOverlay(){
+  $('#btnCloseIndexDetail').onclick = ()=> closeOverlay('overlay-index-detail');
 }
 
 /* ---------------------------------------------------------------- */
@@ -3668,16 +3766,18 @@ function renderBsChart(){
     tfWrap.appendChild(b);
   });
   const series = genPriceSeries(u, state.bs.timeframe);
+  const bsLineColor = series.changePct>=0 ? '#1F8A4D' : '#C8232A';
   const labels = series.prices.map(()=>'');
   if (charts.bsChart) charts.bsChart.destroy();
   charts.bsChart = new Chart($('#bsChart').getContext('2d'), {
     type:'line',
     data:{ labels, datasets:[{ data: series.prices.map(p=>Math.round(p*100)/100),
-      borderColor: series.changePct>=0 ? '#1F8A4D' : '#C8232A',
+      borderColor: bsLineColor,
       backgroundColor: series.changePct>=0 ? 'rgba(31,138,77,0.08)' : 'rgba(200,35,42,0.08)',
-      fill:true, pointRadius:0, borderWidth:2, tension:0.15 }] },
-    options:{ maintainAspectRatio:false, scales:{ x:{ display:false }, y:{ ticks:{ color:chartTextColor(), callback:(v)=>fmtBaht(v) }, grid:{ color:chartGridColor() } } },
-      plugins:{ legend:{ display:false } } }
+      fill:true, pointRadius:0, borderWidth:2, tension:0.15, ...chartHoverPointStyle(bsLineColor) }] },
+    options:{ maintainAspectRatio:false, interaction:chartInteractionOptions(),
+      scales:{ x:{ display:false }, y:{ ticks:{ color:chartTextColor(), callback:(v)=>fmtBaht(v) }, grid:{ color:chartGridColor() } } },
+      plugins:{ legend:{ display:false }, tooltip:chartTooltipOptions(fmtBahtPrice) } }
   });
 }
 function renderBuySellTicket(){
@@ -4487,12 +4587,12 @@ function renderCompare(){
   charts.compare = new Chart($('#compareChart').getContext('2d'), {
     type:'line',
     data:{ labels, datasets:[
-      { label:T('compareGapSeriesLabel'), data:gapSeries, borderColor:'#C8232A', backgroundColor:'rgba(200,35,42,0.12)', fill:true, pointRadius:0, borderWidth:2.5, tension:0.25 }
+      { label:T('compareGapSeriesLabel'), data:gapSeries, borderColor:'#C8232A', backgroundColor:'rgba(200,35,42,0.12)', fill:true, pointRadius:0, borderWidth:2.5, tension:0.25, ...chartHoverPointStyle('#C8232A') }
     ]},
-    options:{ maintainAspectRatio:false,
+    options:{ maintainAspectRatio:false, interaction:chartInteractionOptions(),
       scales:{ x:{ title:{ display:true, text: LANG==='th'?'ปี':'Years', color:chartTextColor() }, ticks:{ color:chartTextColor() }, grid:{ color:chartGridColor() } },
         y:{ ticks:{ color:chartTextColor(), callback:(v)=>fmtBaht(v) }, grid:{ color:chartGridColor() } } },
-      plugins:{ legend:{ display:false } } }
+      plugins:{ legend:{ display:false }, tooltip:chartTooltipOptions(fmtBaht) } }
   });
 
   $('#compareBreakdownFxSub').textContent = T('compareBreakdownFxSub').replace('{rate}', FX.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' THB/USD');
@@ -4758,100 +4858,10 @@ function getOptimizeInputHoldings(target){
   manualSummary.rows.forEach(r=>{ combined.push({ bucket:r.bucket, mu:r.mu, sigma:r.sigma, symbol:r.symbol, underlyingSymbol:r.underlyingSymbol, weight:r.valueTHB/total }); });
   return combined;
 }
-const OPTIMIZE_RISK_LEVELS = [1,2,3,4,5];
-function renderOptimizeRiskChips(){
-  const wrap = $('#optimizeRiskChips'); if (!wrap) return;
-  wrap.innerHTML = '';
-  OPTIMIZE_RISK_LEVELS.forEach(level=>{
-    const b = document.createElement('button');
-    b.textContent = String(level);
-    b.className = (state._optimizeRisk||3)===level ? 'active' : '';
-    b.onclick = ()=>{ state._optimizeRisk = level; renderOptimizeRiskChips(); };
-    wrap.appendChild(b);
-  });
-}
-function openOptimizePortfolio(target){
-  state._optimizeTarget = target;
-  state._optimizeRisk = 3;
-  const current = getOptimizeInputHoldings(target);
-  $('#optimizeEmpty').style.display = current ? 'none' : 'block';
-  $('#optimizeIntro').style.display = current ? 'block' : 'none';
-  $('#optimizeResult').style.display = 'none';
-  $('#optimizeHorizonInput').value = '5';
-  renderOptimizeRiskChips();
-  openOverlay('overlay-optimize');
-}
-// Deterministic: same target + same risk level always produces the same optimized portfolio,
-// so re-opening or re-running Optimize with unchanged answers never gives a different-looking result.
-function runOptimize(){
-  const target = state._optimizeTarget;
-  const current = getOptimizeInputHoldings(target);
-  if (!current) return;
-  const risk = Math.max(1, Math.min(5, Math.round(Number(state._optimizeRisk))||3));
-  Math.max(1, Math.min(30, Math.round(Number($('#optimizeHorizonInput').value))||5)); // horizon collected for future use (schedule length, etc.)
-
-  const currentStats = portfolioStats(current);
-  const currentBT = runBacktest(current, 0, 1000000, 'opt-cur-'+target);
-
-  // Bug fix: this used to interpolate targetReturn across a hardcoded 4%-16% range that doesn't match
-  // what any real portfolio here can actually achieve (the conservative..aggressive proxy range is
-  // ~8.7%-12.6%, computed below). Since sleeveWeightsForTargetReturn() clamps out-of-range requests to
-  // the nearest canonical profile, risk levels 1-2 both silently clamped to "conservative" and 4-5 both
-  // clamped to "aggressive" -- so half the risk slider did nothing, which is exactly the "doesn't really
-  // work / weird" behavior reported. Deriving the range from the actual profile proxies (same values
-  // generatePresetsFromTargetReturn already uses) makes every risk level 1-5 produce a genuinely
-  // different, correctly-ordered result, with 1 and 5 landing exactly on the conservative/aggressive
-  // presets rather than past them.
-  const minR = PROFILE_RETURN_PROXY[PROFILE_ORDER[0]];
-  const maxR = PROFILE_RETURN_PROXY[PROFILE_ORDER[PROFILE_ORDER.length-1]];
-  const targetReturn = minR + (risk-1)/4 * (maxR-minR);
-  // Also scale holding count with risk (6 at risk 1 -> 10 at risk 5, matching the canonical profiles'
-  // own defaults) instead of always defaulting to 8 regardless of risk -- a conservative optimize
-  // should look and feel like the conservative preset, not a differently-weighted version of the same
-  // 8 names.
-  const minHold = DEFAULT_MAX_HOLDINGS[PROFILE_ORDER[0]];
-  const maxHold = DEFAULT_MAX_HOLDINGS[PROFILE_ORDER[PROFILE_ORDER.length-1]];
-  const maxHoldings = Math.round(minHold + (risk-1)/4 * (maxHold-minHold));
-  const optimized = buildPortfolio(null, { targetReturn, maxHoldings, seedTag:'opt-new-'+target+'-risk'+risk });
-  const optimizedStats = portfolioStats(optimized);
-  const optimizedBT = runBacktest(optimized, 0, 1000000, 'opt-new-'+target+'-risk'+risk+'-bt');
-
-  $('#optCurrentRet').textContent = fmtPct(currentStats.ret);
-  $('#optCurrentDD').textContent = T('optimizeDDLabel')+' '+fmtPct(currentBT.maxDD);
-  $('#optNewRet').textContent = fmtPct(optimizedStats.ret);
-  $('#optNewDD').textContent = T('optimizeDDLabel')+' '+fmtPct(optimizedBT.maxDD);
-
-  const sums = sleeveBreakdown(optimized);
-  const keys = Object.keys(sums).sort((a,b)=>sums[b]-sums[a]);
-  const legendWrap = $('#optLegendCol'); legendWrap.innerHTML = '';
-  keys.forEach(k=>{
-    const row = document.createElement('div'); row.className='legend-item';
-    row.innerHTML = '<span class="legend-sq" style="background:'+SLEEVE_COLOR[k]+'"></span><span class="legend-name">'+SLEEVE_LABEL[k][LANG]+'</span><span class="legend-pct">'+fmtPctPlain(sums[k])+'</span>';
-    legendWrap.appendChild(row);
-  });
-
-  const holdWrap = $('#optHoldingsList'); holdWrap.innerHTML = '';
-  optimized.slice().sort((a,b)=>b.weight-a.weight).forEach(h=>{
-    const row = document.createElement('div'); row.className='holding-row';
-    row.innerHTML = '<div class="h-avatar">'+h.underlyingSymbol.slice(0,3)+'</div>' +
-      '<div class="h-mid"><div class="h-sym">'+h.symbol+'</div></div>' +
-      '<div class="h-right"><div class="h-weight">'+fmtPctPlain(h.weight)+'</div></div>';
-    holdWrap.appendChild(row);
-  });
-
-  $('#optimizeIntro').style.display = 'none';
-  $('#optimizeResult').style.display = 'block';
-}
-function wireOptimizeOverlay(){
-  $('#btnOptimize-actual').onclick = ()=> openOptimizePortfolio('actual');
-  $('#btnOptimize-simulated').onclick = ()=> openOptimizePortfolio('simulated');
-  $('#btnCloseOptimize').onclick = ()=> closeOverlay('overlay-optimize');
-  $('#optimizeStartBtn').onclick = runOptimize;
-  $('#optimizeRedoBtn').onclick = ()=>{
-    $('#optimizeResult').style.display = 'none';
-    $('#optimizeIntro').style.display = 'block';
-  };
-}
+// Optimize Portfolio (risk-slider rebalancer) has been removed -- for the Simulated portfolio,
+// "Rebuild my portfolio" (wireEmptyStateButtons) now routes back into the full Portfolio Planner
+// instead. getOptimizeInputHoldings() above is kept: it's still used by the DR vs Overseas Compare
+// screen and Wealth Wrapped to get a unified {bucket,mu,sigma,weight} view of either portfolio.
 
 /* ---------------------------------------------------------------- */
 /* WEALTH WRAPPED -- Spotify-Wrapped-style portfolio recap            */
@@ -5585,14 +5595,14 @@ function renderResultsProjection(f){
   charts.proj = new Chart($('#projChart').getContext('2d'), {
     type:'line',
     data:{ labels, datasets:[
-      { label:T('projP90'), data:p90, borderColor:'rgba(31,138,77,0)', backgroundColor:'rgba(31,138,77,0.12)', fill:'+1', pointRadius:0, tension:0.25 },
-      { label:T('projP50'), data:p50, borderColor:'#1F8A4D', backgroundColor:'rgba(31,138,77,0.12)', fill:false, pointRadius:0, borderWidth:2.5, tension:0.25 },
-      { label:T('projP10'), data:p10, borderColor:'rgba(200,35,42,0)', backgroundColor:'rgba(200,35,42,0.10)', fill:false, pointRadius:0, tension:0.25 }
+      { label:T('projP90'), data:p90, borderColor:'rgba(31,138,77,0)', backgroundColor:'rgba(31,138,77,0.12)', fill:'+1', pointRadius:0, tension:0.25, ...chartHoverPointStyle('#1F8A4D') },
+      { label:T('projP50'), data:p50, borderColor:'#1F8A4D', backgroundColor:'rgba(31,138,77,0.12)', fill:false, pointRadius:0, borderWidth:2.5, tension:0.25, ...chartHoverPointStyle('#1F8A4D') },
+      { label:T('projP10'), data:p10, borderColor:'rgba(200,35,42,0)', backgroundColor:'rgba(200,35,42,0.10)', fill:false, pointRadius:0, tension:0.25, ...chartHoverPointStyle('#C8232A') }
     ]},
-    options:{ maintainAspectRatio:false,
+    options:{ maintainAspectRatio:false, interaction:chartInteractionOptions(),
       scales:{ x:{ title:{ display:true, text: LANG==='th'?'ปี':'Years', color:chartTextColor() }, ticks:{ color:chartTextColor() }, grid:{ color:chartGridColor() } },
         y:{ ticks:{ color:chartTextColor(), callback:(v)=>fmtBaht(v) }, grid:{ color:chartGridColor() } } },
-      plugins:{ legend:{ display:true, labels:{ boxWidth:10, font:{ size:10 }, color:chartTextColor() } } }
+      plugins:{ legend:{ display:true, labels:{ boxWidth:10, font:{ size:10 }, color:chartTextColor() } }, tooltip:chartTooltipOptions(fmtBaht) }
     }
   });
 }
@@ -5612,13 +5622,13 @@ function renderResultsBacktest(f){
   charts.backtest = new Chart($('#backtestChart').getContext('2d'), {
     type:'line',
     data:{ labels, datasets:[
-      { label: LANG==='th'?'มูลค่าพอร์ต':'Portfolio value', data:value, borderColor:'#C8232A', backgroundColor:'rgba(200,35,42,0.08)', fill:true, pointRadius:0, borderWidth:2.5, tension:0.2 },
-      { label: LANG==='th'?'เงินลงทุนสะสม':'Total contributed', data:contributed, borderColor:'#9aa4b5', borderDash:[4,3], fill:false, pointRadius:0, borderWidth:1.75, tension:0 }
+      { label: LANG==='th'?'มูลค่าพอร์ต':'Portfolio value', data:value, borderColor:'#C8232A', backgroundColor:'rgba(200,35,42,0.08)', fill:true, pointRadius:0, borderWidth:2.5, tension:0.2, ...chartHoverPointStyle('#C8232A') },
+      { label: LANG==='th'?'เงินลงทุนสะสม':'Total contributed', data:contributed, borderColor:'#9aa4b5', borderDash:[4,3], fill:false, pointRadius:0, borderWidth:1.75, tension:0, ...chartHoverPointStyle('#9aa4b5') }
     ]},
-    options:{ maintainAspectRatio:false,
+    options:{ maintainAspectRatio:false, interaction:chartInteractionOptions(),
       scales:{ x:{ title:{ display:true, text: LANG==='th'?'ปี':'Years', color:chartTextColor() }, ticks:{ color:chartTextColor() }, grid:{ color:chartGridColor() } },
         y:{ ticks:{ color:chartTextColor(), callback:(v)=>fmtBaht(v) }, grid:{ color:chartGridColor() } } },
-      plugins:{ legend:{ display:true, labels:{ boxWidth:10, font:{ size:10 }, color:chartTextColor() } } }
+      plugins:{ legend:{ display:true, labels:{ boxWidth:10, font:{ size:10 }, color:chartTextColor() } }, tooltip:chartTooltipOptions(fmtBaht) }
     }
   });
 }
@@ -5662,7 +5672,11 @@ function wireSolutionFlowButtons(){
   $('#btnBackToPresets').onclick = ()=>{ renderPresets(); showSolScreen('presets'); };
   $('#btnRestartFromPresets').onclick = resetSolutionFlow;
   $('#btnRestart').onclick = resetSolutionFlow;
+  // Guarded the same way regardless of how the user got here -- straight Planner tab navigation,
+  // the Simulated view's "Rebuild my portfolio" link, or its "Rebuild my portfolio" action-row
+  // button all funnel through this one confirm button, so gating here covers every entry point.
   $('#btnConfirmPortfolio').onclick = ()=>{
+    if (state.simulatedPortfolio && !window.confirm(T('confirmReplaceSimPortfolio'))) return;
     state.simulatedPortfolio = state.finalized;
     state.portfolioViewMode = 'simulated';
     switchTab('portfolio');
@@ -5677,6 +5691,11 @@ function resetSolutionFlow(){
 function wireEmptyStateButtons(){
   $('#btnGoBuildFromPortfolio').onclick = ()=>{ switchTab('planner'); resetSolutionFlow(); };
   $('#btnRebuildFromPortfolio').onclick = ()=>{ switchTab('planner'); resetSolutionFlow(); };
+  // Replaces the old "Optimize portfolio" button in the Simulated view's action row -- routes back
+  // into the full Portfolio Planner (goal -> quiz -> presets -> confirm) instead of a separate
+  // risk-slider rebalancer. #btnConfirmPortfolio itself guards against silently overwriting an
+  // existing Simulated portfolio, so this is safe to reach from a portfolio that's already built.
+  if ($('#btnRePlan-simulated')) $('#btnRePlan-simulated').onclick = ()=>{ switchTab('planner'); resetSolutionFlow(); };
   $('#btnGoMarketsFromPortfolio').onclick = ()=>{ state.marketsFilter='all'; switchTab('markets'); };
 }
 
@@ -5724,6 +5743,7 @@ function init(){
   wireMessagesOverlay();
   wireSettingsOverlay();
   wireMarketDetailOverlay();
+  wireIndexDetailOverlay();
   wireMarketsSearch();
   wireBuySellControls();
   wireBuildOwnOverlay();
@@ -5732,7 +5752,6 @@ function init(){
   wireDrGlobalIndexPage();
   wireActivityOverlay();
   wireScheduleOverlay();
-  wireOptimizeOverlay();
   wireWealthWrapped();
   wirePasscodeOverlay();
   wireOrderReceipt();
