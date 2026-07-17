@@ -87,6 +87,7 @@
   .ob-slide { position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center;
     text-align:center; padding:20px 34px; }
   .ob-slide.active { display:flex; }
+  .ob-quick-settings { display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:22px; }
   .ob-logo { font-size:32px; font-weight:800; margin-bottom:20px; }
   .ob-logo .hl-b { color:var(--ink); } .ob-logo .hl-red { color:var(--red); }
   .ob-icon { width:170px; height:170px; object-fit:contain; margin-bottom:22px; }
@@ -274,6 +275,19 @@
   .wcp-swatch.active { border-color:#fff; box-shadow:0 0 0 2px rgba(255,255,255,0.25); }
   .wrapped-share-actions { display:flex; gap:10px; }
   .wrapped-share-actions .btn { flex:1; }
+  .wrapped-test-banner { background:var(--card); border:1.5px dashed var(--red); border-radius:var(--radius); padding:12px 14px; margin-bottom:14px; }
+  .wtb-row { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .wtb-nav { border:none; background:var(--bg); width:34px; height:34px; border-radius:50%; font-size:18px; font-weight:800;
+    color:var(--ink); cursor:pointer; font-family:inherit; flex:none; }
+  .wtb-mid { flex:1; text-align:center; min-width:0; }
+  .wtb-label { font-size:10.5px; font-weight:800; letter-spacing:0.06em; color:var(--red); }
+  .wtb-persona { font-size:14px; font-weight:800; color:var(--ink); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .wrapped-test-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .wtg-card { display:flex; flex-direction:column; align-items:center; gap:8px; padding:16px 8px; border:1.5px solid var(--line);
+    border-radius:var(--radius); background:var(--card); cursor:pointer; font-family:inherit; }
+  .wtg-card:active { transform:scale(0.97); }
+  .wtg-card img { width:56px; height:56px; object-fit:contain; }
+  .wtg-card span { font-size:12.5px; font-weight:700; color:var(--ink); text-align:center; line-height:1.3; }
   .app-toast { position:fixed; left:50%; bottom:96px; transform:translateX(-50%) translateY(16px); z-index:999;
     background:var(--ink); color:var(--card); font-size:12.5px; font-weight:600; padding:10px 18px; border-radius:999px;
     box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:opacity 0.2s ease, transform 0.2s ease; max-width:82%; text-align:center; }
@@ -389,6 +403,11 @@
      Yahoo Finance/Robinhood charts don't scroll the page while you're dragging on them. */
   .chart-wrap canvas { touch-action: none; }
   .chart-wrap.donut { height:190px; }
+  .chart-nodata { position:absolute; inset:0; display:none; align-items:center; justify-content:center; flex-direction:column;
+    gap:5px; text-align:center; padding:0 24px; background:var(--card); border-radius:var(--radius); }
+  .chart-nodata.show { display:flex; }
+  .chart-nodata .cnd-title { font-size:13px; font-weight:700; color:var(--ink); }
+  .chart-nodata .cnd-sub { font-size:11.5px; color:var(--muted); line-height:1.5; }
   .risk-gauge { padding:10px 4px 2px; }
   .risk-gauge .rg-track { position:relative; height:8px; border-radius:100px;
     background:linear-gradient(90deg,#8aa2c9,#c8a15a,#d9704f,#c8232a); margin:0 8px; }
@@ -661,6 +680,13 @@
     <div class="ob-skip-row"><button class="ob-skip" id="btnSkipOnboarding" data-t="obSkip">Skip</button></div>
     <div class="ob-slides" id="obSlides">
       <div class="ob-slide" data-slide="0">
+        <div class="ob-quick-settings">
+          <div class="lang-inline" id="obLangRow">
+            <button data-lang="en" class="active">EN</button>
+            <button data-lang="th">TH</button>
+          </div>
+          <button class="dark-toggle" id="obDarkModeToggle" role="switch" aria-checked="false" aria-label="Dark mode"><span class="dt-knob"></span></button>
+        </div>
         <div class="ob-logo"><span class="hl-b">DR</span> <span class="hl-red">MASTER</span></div>
         <h2 data-t="obSlide1Title">Own the world, in baht</h2>
         <p data-t="obSlide1Body">Apple, NVIDIA, Tencent and more — settled, converted, and custodied inside your own Bualuang account. No separate overseas brokerage needed.</p>
@@ -1198,6 +1224,11 @@
           <span class="mr-label" data-t="moreWrappedTitle">Your Wealth Wrapped</span>
           <span class="chevron">›</span>
         </div>
+        <div class="more-row" id="moreWrappedTest">
+          <img class="mr-icon" src="assets/mascots/icon_star_filled.png" alt="" />
+          <span class="mr-label" data-t="moreWrappedTestTitle">Preview Wrapped personas</span>
+          <span class="chevron">›</span>
+        </div>
         <div class="more-row" id="moreDarkModeRow">
           <img class="mr-icon" src="assets/mascots/icon_darkmode.png" alt="" />
           <span class="mr-label" data-t="moreDarkMode">Dark mode</span>
@@ -1258,7 +1289,13 @@
         <span class="mkd-chg" id="mdChg">–</span>
       </div>
       <div class="tf-strip" id="mdTfStrip"></div>
-      <div class="chart-wrap tall"><canvas id="mdChart"></canvas></div>
+      <div class="chart-wrap tall">
+        <canvas id="mdChart"></canvas>
+        <div class="chart-nodata" id="mdChartNoData">
+          <div class="cnd-title" data-t="chartNoDataTitle">No price history yet</div>
+          <div class="cnd-sub" id="mdChartNoDataSub"></div>
+        </div>
+      </div>
       <div class="card" style="margin-top:14px;">
         <div class="section-title" id="mdAboutTitle" data-t="mkAboutTitle">About this DR</div>
         <div id="mdInfoRows"></div>
@@ -1307,7 +1344,13 @@
         <button class="side-sell" data-side="sell" data-t="bsTitleSell">Sell</button>
       </div>
       <div class="tf-strip" id="bsTfStrip"></div>
-      <div class="chart-wrap" style="height:140px;"><canvas id="bsChart"></canvas></div>
+      <div class="chart-wrap" style="height:140px;">
+        <canvas id="bsChart"></canvas>
+        <div class="chart-nodata" id="bsChartNoData">
+          <div class="cnd-title" data-t="chartNoDataTitle">No price history yet</div>
+          <div class="cnd-sub" id="bsChartNoDataSub"></div>
+        </div>
+      </div>
       <div class="bs-bidask-row">
         <div class="bb-box"><div class="bb-label" data-t="bsBidLabel">Bid</div><div class="bb-value" id="bsBidVal">–</div></div>
         <div class="bb-box"><div class="bb-label" data-t="bsAskLabel">Ask</div><div class="bb-value" id="bsAskVal">–</div></div>
@@ -1578,13 +1621,27 @@
       <div style="width:30px;"></div>
     </div>
     <div class="overlay-body">
-      <div class="mode-toggle" id="wrappedPortToggle" style="margin-bottom:8px;">
-        <button data-view="actual" class="active" data-t="portToggleActual">Actual</button>
-        <button data-view="simulated" data-t="portToggleSimulated">Simulated</button>
+      <div id="wrappedRealControls">
+        <div class="mode-toggle" id="wrappedPortToggle" style="margin-bottom:8px;">
+          <button data-view="actual" class="active" data-t="portToggleActual">Actual</button>
+          <button data-view="simulated" data-t="portToggleSimulated">Simulated</button>
+        </div>
+        <div class="mode-toggle" id="wrappedPeriodToggle" style="margin-bottom:14px;">
+          <button data-period="monthly" class="active" data-t="wrappedPeriodMonthly">This month</button>
+          <button data-period="yearly" data-t="wrappedPeriodYearly">This year</button>
+        </div>
       </div>
-      <div class="mode-toggle" id="wrappedPeriodToggle" style="margin-bottom:14px;">
-        <button data-period="monthly" class="active" data-t="wrappedPeriodMonthly">This month</button>
-        <button data-period="yearly" data-t="wrappedPeriodYearly">This year</button>
+
+      <div class="wrapped-test-banner" id="wrappedTestBanner" style="display:none;">
+        <div class="wtb-row">
+          <button class="wtb-nav" id="wrappedTestPrev" aria-label="Previous persona">‹</button>
+          <div class="wtb-mid">
+            <div class="wtb-label" data-t="wrappedTestBadge">TEST PREVIEW</div>
+            <div class="wtb-persona" id="wrappedTestPersonaLabel">–</div>
+          </div>
+          <button class="wtb-nav" id="wrappedTestNext" aria-label="Next persona">›</button>
+        </div>
+        <button class="btn ghost" id="wrappedTestExitBtn" data-t="wrappedTestExitBtn" style="margin-top:10px; width:100%;">Exit test mode</button>
       </div>
 
       <div id="wrappedLoading" class="wrapped-loading" style="display:none;">
@@ -1634,6 +1691,18 @@
     </div>
   </div>
 
+  <div class="overlay" id="overlay-wrapped-test-picker">
+    <div class="overlay-header">
+      <button class="overlay-close" id="btnCloseWrappedTestPicker">‹</button>
+      <h1 data-t="wrappedTestPickerTitle">Preview Wrapped personas</h1>
+      <div style="width:30px;"></div>
+    </div>
+    <div class="overlay-body">
+      <p class="hint" data-t="wrappedTestPickerHint" style="margin-bottom:14px;"></p>
+      <div class="wrapped-test-grid" id="wrappedTestGrid"></div>
+    </div>
+  </div>
+
   <div class="overlay" id="overlay-set-goal">
     <div class="overlay-header">
       <button class="overlay-close" id="btnCloseSetGoal">‹</button>
@@ -1671,9 +1740,9 @@
 </div>
 
 <script>
-const DATA = {"fxRate":33.48,"tickers":[{"symbol":"NDX01","underlyingSymbol":"NDX100ETF","underlyingName":"ChinaAMC NASDAQ 100 ETF","underlyingPriceUSD":31.71,"ratio":25,"live":false,"assetClass":"ETF","theme":"index_broad"},{"symbol":"SP50001","underlyingSymbol":"SP500HKETF","underlyingName":"Hang Seng S&P 500 Index ETF","underlyingPriceUSD":19.35,"ratio":20,"live":false,"assetClass":"ETF","theme":"index_broad"},{"symbol":"WORLDA01","underlyingSymbol":"WORLDAETF","underlyingName":"Invesco MSCI World UCITS ETF (Acc)","underlyingPriceUSD":52.73,"ratio":40,"live":false,"assetClass":"ETF","theme":"index_broad"},{"symbol":"CN01","underlyingSymbol":"CSI300ETF","underlyingName":"ChinaAMC CSI 300 Index ETF","underlyingPriceUSD":46.7,"ratio":40,"live":false,"assetClass":"ETF","theme":"index_broad"},{"symbol":"STAR5001","underlyingSymbol":"STAR50ETF","underlyingName":"Premia China STAR50 ETF","underlyingPriceUSD":29.34,"ratio":20,"live":false,"assetClass":"ETF","theme":"index_broad"},{"symbol":"CNTECH01","underlyingSymbol":"HSTECHETF","underlyingName":"ChinaAMC Hang Seng TECH Index ETF","underlyingPriceUSD":39.71,"ratio":25,"live":false,"assetClass":"ETF","theme":"index_broad"},{"symbol":"HK01","underlyingSymbol":"HKTRACKER","underlyingName":"Tracker Fund of Hong Kong","underlyingPriceUSD":43.82,"ratio":40,"live":false,"assetClass":"ETF","theme":"index_broad"},{"symbol":"HKCE01","underlyingSymbol":"HSCEIETF","underlyingName":"Hang Seng China Enterprises Index ETF","underlyingPriceUSD":19.47,"ratio":20,"live":false,"assetClass":"ETF","theme":"index_broad"},{"symbol":"E1VFVN3001","underlyingSymbol":"VN30ETF","underlyingName":"DCVFMVN30 ETF (VN30)","underlyingPriceUSD":16.94,"ratio":10,"live":false,"assetClass":"ETF","theme":"index_broad"},{"symbol":"FUEVFVND01","underlyingSymbol":"VNDIAETF","underlyingName":"DCVFMVN Diamond ETF","underlyingPriceUSD":41.43,"ratio":40,"live":false,"assetClass":"ETF","theme":"index_broad"},{"symbol":"INDIA01","underlyingSymbol":"INDIAETF","underlyingName":"ChinaAMC MSCI India ETF","underlyingPriceUSD":13.8,"ratio":10,"live":false,"assetClass":"ETF","theme":"index_broad"},{"symbol":"JAPAN10001","underlyingSymbol":"JP100ETF","underlyingName":"Hang Seng Japan TOPIX 100 Index ETF","underlyingPriceUSD":27.33,"ratio":20,"live":false,"assetClass":"ETF","theme":"index_broad"},{"symbol":"AAPL01","underlyingSymbol":"AAPL","underlyingName":"Apple Inc.","underlyingPriceUSD":314.86,"ratio":250,"live":true,"assetClass":"Equity","theme":"mega_cap_tech"},{"symbol":"MSFT01","underlyingSymbol":"MSFT","underlyingName":"Microsoft Corporation","underlyingPriceUSD":384.93,"ratio":300,"live":true,"assetClass":"Equity","theme":"mega_cap_tech"},{"symbol":"GOOGL01","underlyingSymbol":"GOOGL","underlyingName":"Alphabet Inc. (Google)","underlyingPriceUSD":359.51,"ratio":250,"live":true,"assetClass":"Equity","theme":"mega_cap_tech"},{"symbol":"AMZN01","underlyingSymbol":"AMZN","underlyingName":"Amazon.com, Inc.","underlyingPriceUSD":247.49,"ratio":200,"live":true,"assetClass":"Equity","theme":"mega_cap_tech"},{"symbol":"META01","underlyingSymbol":"META","underlyingName":"Meta Platforms, Inc.","underlyingPriceUSD":661.04,"ratio":500,"live":true,"assetClass":"Equity","theme":"mega_cap_tech"},{"symbol":"NVDA01","underlyingSymbol":"NVDA","underlyingName":"NVIDIA Corporation","underlyingPriceUSD":211.8,"ratio":150,"live":true,"assetClass":"Equity","theme":"mega_cap_tech"},{"symbol":"TSLA01","underlyingSymbol":"TSLA","underlyingName":"Tesla, Inc.","underlyingPriceUSD":396.18,"ratio":300,"live":true,"assetClass":"Equity","theme":"mega_cap_tech"},{"symbol":"ORCL01","underlyingSymbol":"ORCL","underlyingName":"Oracle Corporation","underlyingPriceUSD":127.94,"ratio":100,"live":true,"assetClass":"Equity","theme":"software_enterprise"},{"symbol":"CRM01","underlyingSymbol":"CRM","underlyingName":"Salesforce, Inc.","underlyingPriceUSD":167.56,"ratio":120,"live":true,"assetClass":"Equity","theme":"software_enterprise"},{"symbol":"PLTR01","underlyingSymbol":"PLTR","underlyingName":"Palantir Technologies Inc.","underlyingPriceUSD":133.72,"ratio":100,"live":true,"assetClass":"Equity","theme":"software_enterprise"},{"symbol":"MICRON01","underlyingSymbol":"MU","underlyingName":"Micron Technology, Inc.","underlyingPriceUSD":983.12,"ratio":750,"live":true,"assetClass":"Equity","theme":"semiconductors"},{"symbol":"INTEL01","underlyingSymbol":"INTC","underlyingName":"Intel Corporation","underlyingPriceUSD":107.76,"ratio":75,"live":true,"assetClass":"Equity","theme":"semiconductors"},{"symbol":"SMIC01","underlyingSymbol":"SMIC","underlyingName":"Semiconductor Manufacturing Intl (SMIC)","underlyingPriceUSD":9.78,"ratio":10,"live":true,"assetClass":"Equity","theme":"semiconductors"},{"symbol":"ASML01","underlyingSymbol":"ASML","underlyingName":"ASML Holding N.V.","underlyingPriceUSD":1775.64,"ratio":1200,"live":true,"assetClass":"Equity","theme":"semi_equipment"},{"symbol":"AMAT01","underlyingSymbol":"AMAT","underlyingName":"Applied Materials, Inc.","underlyingPriceUSD":595.7,"ratio":400,"live":true,"assetClass":"Equity","theme":"semi_equipment"},{"symbol":"KLAC01","underlyingSymbol":"KLAC","underlyingName":"KLA Corporation","underlyingPriceUSD":230.37,"ratio":150,"live":true,"assetClass":"Equity","theme":"semi_equipment"},{"symbol":"LRCX01","underlyingSymbol":"LRCX","underlyingName":"Lam Research Corporation","underlyingPriceUSD":346.1,"ratio":250,"live":true,"assetClass":"Equity","theme":"semi_equipment"},{"symbol":"TER01","underlyingSymbol":"TER","underlyingName":"Teradyne, Inc.","underlyingPriceUSD":353.23,"ratio":250,"live":true,"assetClass":"Equity","theme":"semi_equipment"},{"symbol":"ALAB01","underlyingSymbol":"ALAB","underlyingName":"Astera Labs, Inc.","underlyingPriceUSD":361.78,"ratio":250,"live":true,"assetClass":"Equity","theme":"ai_infrastructure"},{"symbol":"LITE01","underlyingSymbol":"LITE","underlyingName":"Lumentum Holdings Inc.","underlyingPriceUSD":814.8,"ratio":600,"live":true,"assetClass":"Equity","theme":"ai_infrastructure"},{"symbol":"NBIS01","underlyingSymbol":"NBIS","underlyingName":"Nebius Group N.V.","underlyingPriceUSD":194.09,"ratio":150,"live":true,"assetClass":"Equity","theme":"ai_infrastructure"},{"symbol":"VRT01","underlyingSymbol":"VRT","underlyingName":"Vertiv Holdings Co.","underlyingPriceUSD":303.58,"ratio":250,"live":true,"assetClass":"Equity","theme":"ai_infrastructure"},{"symbol":"ASTS01","underlyingSymbol":"ASTS","underlyingName":"AST SpaceMobile, Inc.","underlyingPriceUSD":68.82,"ratio":50,"live":true,"assetClass":"Equity","theme":"space_economy"},{"symbol":"RKLB01","underlyingSymbol":"RKLB","underlyingName":"Rocket Lab Corporation","underlyingPriceUSD":78.81,"ratio":60,"live":true,"assetClass":"Equity","theme":"space_economy"},{"symbol":"SPCX01","underlyingSymbol":"SPCX","underlyingName":"Space Exploration Technologies Corp. (SpaceX)","underlyingPriceUSD":188.64,"ratio":150,"live":false,"assetClass":"Equity","theme":"space_economy"},{"symbol":"COIN01","underlyingSymbol":"COIN","underlyingName":"Coinbase Global, Inc.","underlyingPriceUSD":161.5,"ratio":120,"live":true,"assetClass":"Equity","theme":"digital_assets"},{"symbol":"TENCENT01","underlyingSymbol":"TENCENT","underlyingName":"Tencent Holdings Ltd.","underlyingPriceUSD":60.77,"ratio":50,"live":true,"assetClass":"Equity","theme":"china_internet"},{"symbol":"BABA01","underlyingSymbol":"BABA","underlyingName":"Alibaba Group Holding Ltd.","underlyingPriceUSD":112.32,"ratio":75,"live":true,"assetClass":"Equity","theme":"china_internet"},{"symbol":"BIDU01","underlyingSymbol":"BIDU","underlyingName":"Baidu, Inc.","underlyingPriceUSD":109.73,"ratio":75,"live":true,"assetClass":"Equity","theme":"china_internet"},{"symbol":"BILIBILI01","underlyingSymbol":"BILI","underlyingName":"Bilibili Inc.","underlyingPriceUSD":17.48,"ratio":10,"live":true,"assetClass":"Equity","theme":"china_internet"},{"symbol":"KUAISH01","underlyingSymbol":"KUAISH","underlyingName":"Kuaishou Technology","underlyingPriceUSD":5.73,"ratio":4,"live":true,"assetClass":"Equity","theme":"china_internet"},{"symbol":"BYDCOM01","underlyingSymbol":"BYDCOM","underlyingName":"BYD Company Limited","underlyingPriceUSD":11.15,"ratio":10,"live":true,"assetClass":"Equity","theme":"china_ev_battery"},{"symbol":"CATL01","underlyingSymbol":"CATL","underlyingName":"Contemporary Amperex Technology (CATL)","underlyingPriceUSD":79.74,"ratio":60,"live":true,"assetClass":"Equity","theme":"china_ev_battery"},{"symbol":"XIAOMI01","underlyingSymbol":"XIAOMI","underlyingName":"Xiaomi Corporation","underlyingPriceUSD":3.32,"ratio":2,"live":true,"assetClass":"Equity","theme":"china_ev_battery"},{"symbol":"PINGAN01","underlyingSymbol":"PINGAN","underlyingName":"Ping An Insurance (Group) Co. of China","underlyingPriceUSD":6.97,"ratio":5,"live":true,"assetClass":"Equity","theme":"financials_insurance"},{"symbol":"LVMH01","underlyingSymbol":"LVMH","underlyingName":"LVMH Moet Hennessy Louis Vuitton SE","underlyingPriceUSD":529.41,"ratio":400,"live":true,"assetClass":"Equity","theme":"consumer_luxury"},{"symbol":"ISRG01","underlyingSymbol":"ISRG","underlyingName":"Intuitive Surgical, Inc.","underlyingPriceUSD":379.5,"ratio":300,"live":true,"assetClass":"Equity","theme":"healthcare_medtech"},{"symbol":"BONDUS01","underlyingSymbol":"BONDUSETF","underlyingName":"Premia US Treasury Floating Rate ETF (Acc)","underlyingPriceUSD":16.84,"ratio":10,"live":false,"assetClass":"ETF","theme":"fixed_income"}]};
-const MARKET_DATA = [{"key":"sp500","name":"S&P 500","price":7543.59,"chgPct":0.376},{"key":"hsi","name":"Hang Seng","price":24724.96,"chgPct":1.579},{"key":"nasdaq","name":"Nasdaq","price":26107.01,"chgPct":0.904},{"key":"gold","name":"Gold","price":4035.2,"chgPct":-0.848,"priceUnit":"$"},{"key":"bond10y","name":"US 10Y Yield","price":4.585,"chgPct":-0.521,"isYield":true}];
-const NEWS_DATA = [{"ticker":"NVDA","title":"Bank of America sees Nvidia's next $20 billion business","source":"TheStreet","date":"Jul 15","summary":"Bank of America highlights a new growth avenue for Nvidia beyond its core GPU business, pointing to a roughly $20 billion opportunity as AI infrastructure spending broadens."},{"ticker":"TSLA","title":"Tesla Stock Rises After Wave of Wall Street Target Hikes","source":"GuruFocus","date":"Jul 14","summary":"Several Wall Street analysts raised their price targets on Tesla shares following the company's latest results, citing improving delivery trends and margin stabilization."},{"ticker":"AAPL","title":"Apple's lawsuit shows the importance of AI devices for the iPhone maker's future","source":"Yahoo Finance","date":"Jul 14","summary":"A recent legal dispute underscores how central AI-enabled hardware has become to Apple's product roadmap as it looks to extend its device ecosystem."},{"ticker":"BABA","title":"Alibaba Stock Is Picking Up Steam: Is It Overdue for a Big Rally?","source":"Motley Fool","date":"Jul 14","summary":"Alibaba shares have shown renewed momentum recently, prompting analysts to debate whether the stock is set up for a larger rally after a prolonged period of underperformance."},{"ticker":"NVDA","title":"NVDA, AMD Stocks Climb After 3 Chinese Firms Get US Approval To Purchase Advanced Chips","source":"Stocktwits","date":"Jul 14","summary":"Shares of leading chipmakers rose after regulators approved a handful of Chinese companies to purchase advanced semiconductors, easing some trade-related uncertainty."},{"ticker":"TSLA","title":"Elon Musk's Tesla Posts Best Quarter in Two Years","source":"Motley Fool","date":"Jul 14","summary":"Tesla reported its strongest quarterly results in two years, driven by better-than-expected deliveries and cost discipline across its manufacturing operations."},{"ticker":"MSFT","title":"Microsoft (MSFT) Stock Declines While Market Improves: Some Information for Investors","source":"Zacks","date":"Jul 14","summary":"Microsoft shares slipped even as the broader market advanced, a divergence Zacks attributes to profit-taking after a strong run and sector rotation into other names."},{"ticker":"MSFT","title":"Microsoft Corporation (MSFT) to Cut 4,800 Jobs","source":"Insider Monkey","date":"Jul 14","summary":"Microsoft confirmed a workforce reduction of roughly 4,800 roles, about 2.1% of its global headcount, as part of a restructuring of its gaming and Xbox businesses."},{"ticker":"MSFT","title":"Microsoft CEO adds fuel to Palantir CEO's AI warning","source":"TheStreet","date":"Jul 15","summary":"Microsoft's chief executive echoed concerns raised by Palantir's CEO about the pace and sustainability of current AI industry spending and expectations."},{"ticker":"GOOGL","title":"Alphabet Inc. (GOOGL): 8 Best Stocks to Buy Following Federal Reserve Pivot Expectations","source":"Insider Monkey","date":"Jul 15","summary":"Alphabet was named among a group of stocks favored by hedge funds heading into expected shifts in Federal Reserve policy, with continued momentum in its AI product integrations."},{"ticker":"GOOGL","title":"Cypress Creek, Google break ground on Steel River Energy Center, LG to supply batteries","source":"Power Technology","date":"Jul 15","summary":"Google is backing a new solar and battery storage project aimed at supporting the power needs of its growing data center footprint."},{"ticker":"PLTR","title":"Microsoft CEO adds fuel to Palantir CEO's AI warning","source":"TheStreet","date":"Jul 15","summary":"Palantir CEO Alex Karp's warning about the sustainability of current AI industry spending was echoed by Microsoft's chief executive, adding weight to a growing debate on the sector."},{"ticker":"PLTR","title":"Palantir Trades at 64X Sales. Here's Whether That Premium Is Justified.","source":"Motley Fool","date":"Jul 14","summary":"Palantir's valuation multiple remains well above the software sector average, prompting debate over whether its growth and margins can justify the premium."},{"ticker":"PLTR","title":"Is Palantir (PLTR) the Best Growth Stock With Highest Upside Potential?","source":"Insider Monkey","date":"Jul 14","summary":"A new operating-model partnership with Rackspace aims to help regulated and sovereign enterprises deploy Palantir's Foundry and AIP platforms in production."},{"ticker":"ORCL","title":"Market Chatter: Oracle Leads Race for Japan's Classified Cloud Contract Amid Security Push","source":"MT Newswires","date":"Jul 15","summary":"Oracle has emerged as the frontrunner to provide Japan with highly secure, air-gapped cloud infrastructure as part of a broader government security push."},{"ticker":"ORCL","title":"ORCL Vs IBM: Retail Traders Favor This Beaten-Down Big Tech Stock For Stronger Rebound","source":"Stocktwits","date":"Jul 15","summary":"Both Oracle and IBM have declined sharply in recent sessions, and retail sentiment data shows traders leaning toward one name for a faster rebound."},{"ticker":"ORCL","title":"Oracle Adds AI Agent Builder","source":"GuruFocus","date":"Jul 14","summary":"Oracle combined no-code and developer tooling into a single platform aimed at helping enterprises build and deploy AI agents faster."},{"ticker":"COIN","title":"Coinbase (COIN) Faces A New Test As The CLARITY Act Gains Momentum","source":"Simply Wall St.","date":"Jul 14","summary":"Proposed U.S. legislation could introduce new regulatory requirements for crypto exchanges and custodians, with direct implications for Coinbase's operations."},{"ticker":"COIN","title":"JPMorgan cuts earnings forecasts for two major crypto companies","source":"TheStreet","date":"Jul 14","summary":"JPMorgan trimmed its estimates for Coinbase and Circle, citing pressure on stablecoin economics from new competitive partnerships in the sector."},{"ticker":"COIN","title":"Coinbase CEO Brian Armstrong's poll shows most expect more Bitcoin pain","source":"TheStreet","date":"Jul 14","summary":"An informal poll run by Coinbase's chief executive found more respondents expect further near-term weakness in Bitcoin than a bottom forming."},{"ticker":"META","title":"Meta Ups Investment to $50B for Louisiana Data Center","source":"CRE Daily","date":"Jul 15","summary":"Meta significantly expanded its planned investment in a Louisiana data center campus as part of its broader push to scale AI compute capacity."},{"ticker":"META","title":"Meta employees allege discriminatory AI-driven layoffs","source":"AFP","date":"Jul 15","summary":"A group of Meta employees filed a lawsuit alleging the company's AI-assisted layoff process disproportionately affected staff on medical or family leave, a claim the company denies."},{"ticker":"META","title":"Why Meta stock suddenly broke out after a long slide","source":"Yahoo Finance","date":"Jul 14","summary":"Meta shares climbed back above a key technical level after an extended period of underperformance, prompting analysts to reassess the stock's near-term trend."}];
+const DATA = {"fxRate":33.48,"tickers":[{"symbol":"NDX01","underlyingSymbol":"NDX100ETF","underlyingName":"ChinaAMC NASDAQ 100 ETF","underlyingPriceUSD":31.71,"ratio":25,"live":false,"assetClass":"ETF","theme":"index_broad","listedDate":"2020-02-18"},{"symbol":"SP50001","underlyingSymbol":"SP500HKETF","underlyingName":"Hang Seng S&P 500 Index ETF","underlyingPriceUSD":19.35,"ratio":20,"live":false,"assetClass":"ETF","theme":"index_broad","listedDate":"2024-10-22"},{"symbol":"WORLDA01","underlyingSymbol":"WORLDAETF","underlyingName":"Invesco MSCI World UCITS ETF (Acc)","underlyingPriceUSD":52.73,"ratio":40,"live":false,"assetClass":"ETF","theme":"index_broad","listedDate":"2020-07-22"},{"symbol":"CN01","underlyingSymbol":"CSI300ETF","underlyingName":"ChinaAMC CSI 300 Index ETF","underlyingPriceUSD":46.7,"ratio":40,"live":false,"assetClass":"ETF","theme":"index_broad","listedDate":"2020-11-10"},{"symbol":"STAR5001","underlyingSymbol":"STAR50ETF","underlyingName":"Premia China STAR50 ETF","underlyingPriceUSD":29.34,"ratio":20,"live":false,"assetClass":"ETF","theme":"index_broad","listedDate":"2021-04-14"},{"symbol":"CNTECH01","underlyingSymbol":"HSTECHETF","underlyingName":"ChinaAMC Hang Seng TECH Index ETF","underlyingPriceUSD":39.71,"ratio":25,"live":false,"assetClass":"ETF","theme":"index_broad","listedDate":"2021-08-19"},{"symbol":"HK01","underlyingSymbol":"HKTRACKER","underlyingName":"Tracker Fund of Hong Kong","underlyingPriceUSD":43.82,"ratio":40,"live":false,"assetClass":"ETF","theme":"index_broad","listedDate":"2019-06-10"},{"symbol":"HKCE01","underlyingSymbol":"HSCEIETF","underlyingName":"Hang Seng China Enterprises Index ETF","underlyingPriceUSD":19.47,"ratio":20,"live":false,"assetClass":"ETF","theme":"index_broad","listedDate":"2019-09-05"},{"symbol":"E1VFVN3001","underlyingSymbol":"VN30ETF","underlyingName":"DCVFMVN30 ETF (VN30)","underlyingPriceUSD":16.94,"ratio":10,"live":false,"assetClass":"ETF","theme":"index_broad","listedDate":"2018-11-20"},{"symbol":"FUEVFVND01","underlyingSymbol":"VNDIAETF","underlyingName":"DCVFMVN Diamond ETF","underlyingPriceUSD":41.43,"ratio":40,"live":false,"assetClass":"ETF","theme":"index_broad","listedDate":"2019-03-15"},{"symbol":"INDIA01","underlyingSymbol":"INDIAETF","underlyingName":"ChinaAMC MSCI India ETF","underlyingPriceUSD":13.8,"ratio":10,"live":false,"assetClass":"ETF","theme":"index_broad","listedDate":"2021-11-02"},{"symbol":"JAPAN10001","underlyingSymbol":"JP100ETF","underlyingName":"Hang Seng Japan TOPIX 100 Index ETF","underlyingPriceUSD":27.33,"ratio":20,"live":false,"assetClass":"ETF","theme":"index_broad","listedDate":"2022-03-08"},{"symbol":"AAPL01","underlyingSymbol":"AAPL","underlyingName":"Apple Inc.","underlyingPriceUSD":333.26,"ratio":250,"live":true,"assetClass":"Equity","theme":"mega_cap_tech","listedDate":"2025-05-15"},{"symbol":"MSFT01","underlyingSymbol":"MSFT","underlyingName":"Microsoft Corporation","underlyingPriceUSD":401.1,"ratio":300,"live":true,"assetClass":"Equity","theme":"mega_cap_tech","listedDate":"2025-05-15"},{"symbol":"GOOGL01","underlyingSymbol":"GOOGL","underlyingName":"Alphabet Inc. (Google)","underlyingPriceUSD":354.46,"ratio":250,"live":true,"assetClass":"Equity","theme":"mega_cap_tech","listedDate":"2025-05-15"},{"symbol":"AMZN01","underlyingSymbol":"AMZN","underlyingName":"Amazon.com, Inc.","underlyingPriceUSD":249.89,"ratio":200,"live":true,"assetClass":"Equity","theme":"mega_cap_tech","listedDate":"2025-05-15"},{"symbol":"META01","underlyingSymbol":"META","underlyingName":"Meta Platforms, Inc.","underlyingPriceUSD":664.54,"ratio":500,"live":true,"assetClass":"Equity","theme":"mega_cap_tech","listedDate":"2025-05-15"},{"symbol":"NVDA01","underlyingSymbol":"NVDA","underlyingName":"NVIDIA Corporation","underlyingPriceUSD":207.4,"ratio":150,"live":true,"assetClass":"Equity","theme":"mega_cap_tech","listedDate":"2025-05-15"},{"symbol":"TSLA01","underlyingSymbol":"TSLA","underlyingName":"Tesla, Inc.","underlyingPriceUSD":391.06,"ratio":300,"live":true,"assetClass":"Equity","theme":"mega_cap_tech","listedDate":"2025-05-15"},{"symbol":"ORCL01","underlyingSymbol":"ORCL","underlyingName":"Oracle Corporation","underlyingPriceUSD":124.21,"ratio":100,"live":true,"assetClass":"Equity","theme":"software_enterprise","listedDate":"2026-01-09"},{"symbol":"CRM01","underlyingSymbol":"CRM","underlyingName":"Salesforce, Inc.","underlyingPriceUSD":172.68,"ratio":120,"live":true,"assetClass":"Equity","theme":"software_enterprise","listedDate":"2026-01-09"},{"symbol":"PLTR01","underlyingSymbol":"PLTR","underlyingName":"Palantir Technologies Inc.","underlyingPriceUSD":134.44,"ratio":100,"live":true,"assetClass":"Equity","theme":"software_enterprise","listedDate":"2026-07-10"},{"symbol":"MICRON01","underlyingSymbol":"MU","underlyingName":"Micron Technology, Inc.","underlyingPriceUSD":853.2,"ratio":600,"live":true,"assetClass":"Equity","theme":"semiconductors","listedDate":"2026-01-09"},{"symbol":"INTEL01","underlyingSymbol":"INTC","underlyingName":"Intel Corporation","underlyingPriceUSD":96.98,"ratio":75,"live":true,"assetClass":"Equity","theme":"semiconductors","listedDate":"2026-06-18"},{"symbol":"SMIC01","underlyingSymbol":"SMIC","underlyingName":"Semiconductor Manufacturing Intl (SMIC)","underlyingPriceUSD":9.27,"ratio":10,"live":true,"assetClass":"Equity","theme":"semiconductors","listedDate":"2026-01-09"},{"symbol":"ASML01","underlyingSymbol":"ASML","underlyingName":"ASML Holding N.V.","underlyingPriceUSD":1784.87,"ratio":1200,"live":true,"assetClass":"Equity","theme":"semi_equipment","listedDate":"2026-06-18"},{"symbol":"AMAT01","underlyingSymbol":"AMAT","underlyingName":"Applied Materials, Inc.","underlyingPriceUSD":560.93,"ratio":400,"live":true,"assetClass":"Equity","theme":"semi_equipment","listedDate":"2026-06-18"},{"symbol":"KLAC01","underlyingSymbol":"KLAC","underlyingName":"KLA Corporation","underlyingPriceUSD":219.37,"ratio":150,"live":true,"assetClass":"Equity","theme":"semi_equipment","listedDate":"2026-06-18"},{"symbol":"LRCX01","underlyingSymbol":"LRCX","underlyingName":"Lam Research Corporation","underlyingPriceUSD":320.96,"ratio":250,"live":true,"assetClass":"Equity","theme":"semi_equipment","listedDate":"2026-06-18"},{"symbol":"TER01","underlyingSymbol":"TER","underlyingName":"Teradyne, Inc.","underlyingPriceUSD":322.3,"ratio":250,"live":true,"assetClass":"Equity","theme":"semi_equipment","listedDate":"2026-06-18"},{"symbol":"ALAB01","underlyingSymbol":"ALAB","underlyingName":"Astera Labs, Inc.","underlyingPriceUSD":319.74,"ratio":250,"live":true,"assetClass":"Equity","theme":"ai_infrastructure","listedDate":"2026-06-18"},{"symbol":"LITE01","underlyingSymbol":"LITE","underlyingName":"Lumentum Holdings Inc.","underlyingPriceUSD":706.23,"ratio":500,"live":true,"assetClass":"Equity","theme":"ai_infrastructure","listedDate":"2026-06-18"},{"symbol":"NBIS01","underlyingSymbol":"NBIS","underlyingName":"Nebius Group N.V.","underlyingPriceUSD":171.77,"ratio":120,"live":true,"assetClass":"Equity","theme":"ai_infrastructure","listedDate":"2026-06-18"},{"symbol":"VRT01","underlyingSymbol":"VRT","underlyingName":"Vertiv Holdings Co.","underlyingPriceUSD":294.11,"ratio":200,"live":true,"assetClass":"Equity","theme":"ai_infrastructure","listedDate":"2026-06-18"},{"symbol":"ASTS01","underlyingSymbol":"ASTS","underlyingName":"AST SpaceMobile, Inc.","underlyingPriceUSD":55.01,"ratio":40,"live":true,"assetClass":"Equity","theme":"space_economy","listedDate":"2026-06-18"},{"symbol":"RKLB01","underlyingSymbol":"RKLB","underlyingName":"Rocket Lab Corporation","underlyingPriceUSD":67.35,"ratio":50,"live":true,"assetClass":"Equity","theme":"space_economy","listedDate":"2026-06-18"},{"symbol":"SPCX01","underlyingSymbol":"SPCX","underlyingName":"Space Exploration Technologies Corp. (SpaceX)","underlyingPriceUSD":188.64,"ratio":150,"live":false,"assetClass":"Equity","theme":"space_economy","listedDate":"2026-06-18"},{"symbol":"COIN01","underlyingSymbol":"COIN","underlyingName":"Coinbase Global, Inc.","underlyingPriceUSD":160.49,"ratio":120,"live":true,"assetClass":"Equity","theme":"digital_assets","listedDate":"2026-06-18"},{"symbol":"TENCENT01","underlyingSymbol":"TENCENT","underlyingName":"Tencent Holdings Ltd.","underlyingPriceUSD":60.49,"ratio":50,"live":true,"assetClass":"Equity","theme":"china_internet","listedDate":"2025-05-15"},{"symbol":"BABA01","underlyingSymbol":"BABA","underlyingName":"Alibaba Group Holding Ltd.","underlyingPriceUSD":117.49,"ratio":100,"live":true,"assetClass":"Equity","theme":"china_internet","listedDate":"2025-05-15"},{"symbol":"BIDU01","underlyingSymbol":"BIDU","underlyingName":"Baidu, Inc.","underlyingPriceUSD":112.82,"ratio":75,"live":true,"assetClass":"Equity","theme":"china_internet","listedDate":"2021-05-25"},{"symbol":"BILIBILI01","underlyingSymbol":"BILI","underlyingName":"Bilibili Inc.","underlyingPriceUSD":19.0,"ratio":20,"live":true,"assetClass":"Equity","theme":"china_internet","listedDate":"2026-01-09"},{"symbol":"KUAISH01","underlyingSymbol":"KUAISH","underlyingName":"Kuaishou Technology","underlyingPriceUSD":5.72,"ratio":4,"live":true,"assetClass":"Equity","theme":"china_internet","listedDate":"2026-01-09"},{"symbol":"BYDCOM01","underlyingSymbol":"BYDCOM","underlyingName":"BYD Company Limited","underlyingPriceUSD":11.34,"ratio":10,"live":true,"assetClass":"Equity","theme":"china_ev_battery","listedDate":"2025-05-15"},{"symbol":"CATL01","underlyingSymbol":"CATL","underlyingName":"Contemporary Amperex Technology (CATL)","underlyingPriceUSD":78.27,"ratio":60,"live":true,"assetClass":"Equity","theme":"china_ev_battery","listedDate":"2026-01-09"},{"symbol":"XIAOMI01","underlyingSymbol":"XIAOMI","underlyingName":"Xiaomi Corporation","underlyingPriceUSD":3.51,"ratio":2,"live":true,"assetClass":"Equity","theme":"china_ev_battery","listedDate":"2025-05-15"},{"symbol":"PINGAN01","underlyingSymbol":"PINGAN","underlyingName":"Ping An Insurance (Group) Co. of China","underlyingPriceUSD":7.01,"ratio":5,"live":true,"assetClass":"Equity","theme":"financials_insurance","listedDate":"2025-05-15"},{"symbol":"LVMH01","underlyingSymbol":"LVMH","underlyingName":"LVMH Moet Hennessy Louis Vuitton SE","underlyingPriceUSD":548.38,"ratio":400,"live":true,"assetClass":"Equity","theme":"consumer_luxury","listedDate":"2021-09-13"},{"symbol":"ISRG01","underlyingSymbol":"ISRG","underlyingName":"Intuitive Surgical, Inc.","underlyingPriceUSD":402.33,"ratio":300,"live":true,"assetClass":"Equity","theme":"healthcare_medtech","listedDate":"2026-01-09"},{"symbol":"BONDUS01","underlyingSymbol":"BONDUSETF","underlyingName":"Premia US Treasury Floating Rate ETF (Acc)","underlyingPriceUSD":16.84,"ratio":10,"live":false,"assetClass":"ETF","theme":"fixed_income","listedDate":"2026-06-18"}]};
+const MARKET_DATA = [{"key":"sp500","name":"S&P 500","price":7533.77,"chgPct":-0.51},{"key":"hsi","name":"Hang Seng","price":24705.1,"chgPct":-1.214},{"key":"nasdaq","name":"Nasdaq","price":25881.95,"chgPct":-1.474},{"key":"gold","name":"Gold","price":3985.3,"chgPct":-1.371,"priceUnit":"$"},{"key":"bond10y","name":"US 10Y Yield","price":4.57,"chgPct":0.528,"isYield":true}];
+const NEWS_DATA = [{"ticker":"NVDA","title":"NVIDIA (NVDA) Stock Price Forecast: NVDA Tests $212 as AI Demand and China Shipments Lift Outlook","source":"FX Leaders","date":"Jul 15","summary":"Nvidia shares pushed toward $212 after eased US export controls reopened UAE sales and reports that Washington resumed issuing licenses for H20 chip sales into China."},{"ticker":"NVDA","title":"Nvidia Stock Just Did Something for the First Time in 7 Years. Here's What History Says Happens Next.","source":"Motley Fool","date":"Jul 12","summary":"Nvidia's forward price-to-earnings multiple fell to its lowest level in seven years even as shares sit near record highs, a divergence the piece argues reflects surging earnings growth."},{"ticker":"NVDA","title":"NVIDIA (NVDA) Stock Price Forecast July 2026: Goldman Says 21.7x Is 'Compelling' After Kyber Delay Denied","source":"TradingKey","date":"Jul 15","summary":"Nvidia denied reports that its Kyber NVL144 AI platform would slip to 2028, while Goldman Sachs called the stock's forward earnings multiple attractive versus its five-year average."},{"ticker":"TSLA","title":"Tesla (TSLA) Stock Hits $420 in July 2026 \u2014 AI Robotaxi & Optimus Hype Fuels Volatility","source":"FX Leaders","date":"Jul 1","summary":"Tesla shares climbed toward $420 on enthusiasm for the Cybercab and Optimus humanoid robot programs, even as the stock remains down for the year on valuation concerns."},{"ticker":"TSLA","title":"Tesla's Stock Tanks Despite Growing Deliveries","source":"Forbes","date":"Jul 2","summary":"Tesla delivered 480,126 vehicles in Q2, up 25% year over year and well above Wall Street's roughly 406,000 estimate, yet shares briefly fell as investors focused on valuation."},{"ticker":"TSLA","title":"Why Did Tesla Stock Jump Today?","source":"Motley Fool","date":"Jul 6","summary":"Shares rose after Tesla officially launched its driverless robotaxi service in Miami, Florida, extending the rollout beyond its original Austin market."},{"ticker":"AAPL","title":"Why Apple (AAPL) Stock Hit a New Record High Today \u2013 July 13, 2026","source":"TipRanks","date":"Jul 13","summary":"Apple shares climbed to a fresh record near $327, putting the stock up roughly 20% year to date on continued AI-services momentum and a rebounding smartwatch business."},{"ticker":"AAPL","title":"Apple Is Up 20% in 2026. What Will It Take for AAPL Stock to Hit $350?","source":"24/7 Wall St.","date":"Jul 15","summary":"Analysts weigh what could drive Apple's next leg higher after its AI-services approval in China, with Q3 earnings due July 30 and free cash flow expected to top $140 billion this year."},{"ticker":"AAPL","title":"Company News for July 7, 2026","source":"The Globe and Mail","date":"Jul 7","summary":"Broadcom and Apple extended their existing custom-chip supply agreement through 2031, underscoring Apple's continued reliance on Broadcom for in-house silicon."},{"ticker":"MSFT","title":"Prediction: Microsoft Stock Is Going to Soar After July 29","source":"Motley Fool","date":"Jul 16","summary":"Microsoft heads into its fiscal Q4 report on July 29 trading roughly 29% below its record high, with analysts citing a cheap forward multiple relative to its AI growth trajectory."},{"ticker":"MSFT","title":"Microsoft Stock Looks Cheap. Here's What's Really Going On","source":"Motley Fool","date":"Jul 15","summary":"Microsoft trades at its lowest forward earnings multiple since 2023 even as Copilot licenses grew 250% year over year, with the bear case centered on rising AI capital spending."},{"ticker":"GOOGL","title":"Alphabet (GOOGL) Aims to Raise $80 Billion in Equity Offerings","source":"Reuters (via Yahoo Finance)","date":"Jul 14","summary":"Alphabet is looking to raise more than $80 billion, including a major investment from Berkshire Hathaway, to help fund its AI infrastructure buildout."},{"ticker":"GOOGL","title":"Alphabet (GOOGL) Stock Price Forecast 2026: Cloud Hit $20B But FCF Collapsed \u2014 Buy or Short?","source":"TradingKey","date":"Jul 10","summary":"Google Cloud revenue hit $20.03 billion, up 63% year over year, with a record $462 billion backlog, even as free cash flow came under pressure from AI-related spending."},{"ticker":"BABA","title":"Alibaba (BABA) Stock Forecast July 2026: Four Catalysts Drove 12% in Two Days; Is the $160 Target Achievable?","source":"TradingKey","date":"Jul 8","summary":"Alibaba gained 12% in two sessions after a $600 million DOJ settlement, a Pentagon rule reprieve, and expectations of roughly 45% cloud growth."},{"ticker":"BABA","title":"Alibaba Stock Surges As Cloud AI Momentum Reignites Bull Case","source":"Timothy Sykes","date":"Jul 15","summary":"Shares extended gains as renewed optimism around cloud and AI growth drew fresh Wall Street support heading into Alibaba's next earnings report."},{"ticker":"BABA","title":"Alibaba Shares Jump Most in 10 Months as Rebound Hopes Grow","source":"Bloomberg","date":"Jul 8","summary":"Alibaba's Hong Kong-listed shares jumped the most since September as investors rotated back into Chinese internet stocks that had lagged the broader market."},{"ticker":"PLTR","title":"Palantir Stock Pops As Nvidia AI Deal And Army Win Fuel Bullish Targets","source":"StocksToTrade","date":"Jul 1","summary":"Palantir and Nvidia announced a partnership pairing Palantir's Foundry and AIP platforms with Nvidia's Nemotron AI models, while the US Army selected Foundry for its NGC2 modernization program."},{"ticker":"PLTR","title":"Palantir Just Hit $300 Billion. The Numbers Say That's Only the Start.","source":"24/7 Wall St.","date":"Jul 8","summary":"Palantir's market capitalization topped $300 billion as the company guided for full-year 2026 revenue of roughly $7.65 billion, about 71% growth year over year."},{"ticker":"PLTR","title":"Palantir Stock Performing Very Well in July after Sovereign AI Plan with Nvidia","source":"FX Leaders","date":"Jul 15","summary":"Shares extended their rebound from June's low as investors continued to price in Palantir's expanding AI and defense partnerships."},{"ticker":"ORCL","title":"Oracle Announces Record Q4 and FY 2026 Results Driven by Cloud Infrastructure & Cloud Applications","source":"Oracle Investor Relations","date":"Jul 11","summary":"Oracle posted quarterly revenue of $19.2 billion, up 21%, with cloud revenue up 47% as Cloud Infrastructure growth accelerated to 93%."},{"ticker":"ORCL","title":"ORCL Stock Tests $140 as Oracle's $638B AI Backlog Faces Debt, Cash Flow and Rating Pressure","source":"FX Leaders","date":"Jul 13","summary":"Shares came under pressure as investors questioned Oracle's ability to convert its AI order backlog into cash amid rising debt and a recent S&P downgrade to BBB-."},{"ticker":"ORCL","title":"Green day on Wednesday for Oracle stock after gaining 3.58%","source":"StockInvest.us","date":"Jul 15","summary":"Oracle shares rebounded modestly after a sharp pullback, as investors weighed the company's expanding AI infrastructure backlog against balance-sheet concerns."},{"ticker":"COIN","title":"Coinbase Stock Draws Bullish Targets As Super App Vision Expands","source":"StocksToTrade","date":"Jul 1","summary":"Benchmark reaffirmed a Buy rating and $270 price target after Coinbase's second System Update pushed further into tokenized stocks, options, and AI-powered advisory tools."},{"ticker":"COIN","title":"Coinbase (COIN) Stock Is Up, What You Need To Know","source":"StockStory","date":"Jul 2","summary":"Coinbase joined more than 140 companies including Google, BlackRock, Visa and Mastercard to launch a new stablecoin, Open USD."},{"ticker":"COIN","title":"Coinbase Stock Price Prediction July 2026: When Will COIN Rise?","source":"CryptoTimes","date":"Jul 6","summary":"Coinbase shares remain down nearly 30% year to date and well below their 52-week high, after the company reported a Q1 net loss on lower transaction revenue."},{"ticker":"META","title":"Meta Stock Surged 9% to $612.91 on July 1 After Reports That Mark Zuckerberg Is Building a Cloud Business to Compete With Amazon, Microsoft, and Alphabet","source":"Motley Fool","date":"Jul 1","summary":"Reports that Meta is building an AI cloud business under the 'Meta Compute' banner sent shares sharply higher as investors priced in a fourth hyperscaler entering the market."},{"ticker":"META","title":"META Jumps As Meta Platforms Unveils Aggressive AI Cloud Push","source":"Timothy Sykes","date":"Jul 10","summary":"Meta said it would invest more than $50 billion into a single Louisiana data center, more than doubling its planned capacity there to 5 gigawatts."},{"ticker":"META","title":"Meta Platforms Surges As AI Cloud And Chip Ambitions Accelerate","source":"StocksToTrade","date":"Jul 10","summary":"In-house 'Iris' AI chips set to enter production in September aim to lift Meta's computing capacity to 14 gigawatts next year and reduce reliance on third-party accelerators."}];
 </script>
 <script>
 /* ============================== I18N ============================== */
@@ -1704,6 +1773,9 @@ const STRINGS = {
     marketsTitle:"Markets", marketsFilterAll:"All", marketsFilterFavorites:"Favorites", marketsFilterGold:"Gold", marketsFilterBonds:"Bonds",
     marketsSearchPlaceholder:"Search by name or ticker",
     mkLiveTag:"Live", mkDemoTag:"Illustrative", mkAboutTitle:"About this DR",
+    chartNoDataTitle:"No price history yet",
+    chartNoDataSubTemplate:"{symbol} started trading on {date} — try a shorter timeframe.",
+    notListedYetLabel:"Not listed yet",
     mkFieldUnderlying:"Underlying", mkFieldSector:"Sector", mkFieldRatio:"DR ratio", mkFieldNav:"NAV formula",
     mkRatioLine:(t)=>`${t.ratio.toLocaleString('en-US')} units of ${t.symbol} = 1 share of ${t.underlyingName}`,
     mkAddFav:"Add to Favorites", mkRemoveFav:"Remove from Favorites",
@@ -1776,6 +1848,11 @@ const STRINGS = {
     goalAddBtn:"Add a goal", goalMaxReachedBtn:"Goal limit reached (3/3)",
     goalMaxHint:"You can set up to 3 goals per portfolio.",
     moreWrappedTitle:"Your Wealth Wrapped",
+    moreWrappedTestTitle:"Preview Wrapped personas",
+    wrappedTestPickerTitle:"Preview Wrapped personas",
+    wrappedTestPickerHint:"Pick any investor persona to preview the full Wealth Wrapped page with made-up holdings and P&L — a quick way to see every character without building a matching portfolio.",
+    wrappedTestBadge:"TEST PREVIEW",
+    wrappedTestExitBtn:"Exit test mode",
     wrappedTeaserTitle:"See your Wealth Wrapped",
     wrappedTeaserSub:"Your investor persona, top DRs & more",
     wrappedLoading1:"Crunching your numbers…",
@@ -2004,6 +2081,9 @@ const STRINGS = {
     marketsTitle:"ตลาด", marketsFilterAll:"ทั้งหมด", marketsFilterFavorites:"รายการโปรด", marketsFilterGold:"ทองคำ", marketsFilterBonds:"ตราสารหนี้",
     marketsSearchPlaceholder:"ค้นหาด้วยชื่อหรือสัญลักษณ์",
     mkLiveTag:"ราคาจริง", mkDemoTag:"ราคาจำลอง", mkAboutTitle:"เกี่ยวกับ DR นี้",
+    chartNoDataTitle:"ยังไม่มีข้อมูลราคาย้อนหลัง",
+    chartNoDataSubTemplate:"{symbol} เริ่มซื้อขายเมื่อ {date} — ลองเลือกช่วงเวลาที่สั้นลง",
+    notListedYetLabel:"ยังไม่เข้าซื้อขาย",
     mkFieldUnderlying:"หุ้นอ้างอิง", mkFieldSector:"หมวดธุรกิจ", mkFieldRatio:"อัตราส่วน DR", mkFieldNav:"สูตรคำนวณ NAV",
     mkRatioLine:(t)=>`${t.ratio.toLocaleString('en-US')} หน่วยของ ${t.symbol} = หุ้น ${t.underlyingName} จำนวน 1 หุ้น`,
     mkAddFav:"เพิ่มในรายการโปรด", mkRemoveFav:"นำออกจากรายการโปรด",
@@ -2076,6 +2156,11 @@ const STRINGS = {
     goalAddBtn:"เพิ่มเป้าหมาย", goalMaxReachedBtn:"ครบจำนวนเป้าหมายแล้ว (3/3)",
     goalMaxHint:"คุณสามารถตั้งเป้าหมายได้สูงสุด 3 เป้าหมายต่อพอร์ต",
     moreWrappedTitle:"Wealth Wrapped ของคุณ",
+    moreWrappedTestTitle:"พรีวิวคาแรกเตอร์ Wrapped",
+    wrappedTestPickerTitle:"พรีวิวคาแรกเตอร์ Wrapped",
+    wrappedTestPickerHint:"เลือกคาแรกเตอร์นักลงทุนแบบใดก็ได้เพื่อดูหน้า Wealth Wrapped แบบเต็มพร้อมข้อมูลการถือครองและกำไร/ขาดทุนสมมติ วิธีที่รวดเร็วในการดูทุกคาแรกเตอร์โดยไม่ต้องสร้างพอร์ตให้ตรงเงื่อนไข",
+    wrappedTestBadge:"ตัวอย่างทดสอบ",
+    wrappedTestExitBtn:"ออกจากโหมดทดสอบ",
     wrappedTeaserTitle:"ดู Wealth Wrapped ของคุณ",
     wrappedTeaserSub:"สไตล์นักลงทุนของคุณ, DR อันดับต้น และอื่นๆ",
     wrappedLoading1:"กำลังประมวลผลตัวเลขของคุณ…",
@@ -2421,7 +2506,7 @@ function buildUniverse(){
     universe.push({
       symbol: rep.symbol, underlyingSymbol: rep.underlyingSymbol, underlyingName: rep.underlyingName,
       priceUSD: rep.underlyingPriceUSD, ratio: rep.ratio, live: rep.live, bucket, mu, sigma,
-      sharpe: (mu - RF) / sigma
+      sharpe: (mu - RF) / sigma, listedDate: rep.listedDate || null
     });
   });
   return universe;
@@ -2928,6 +3013,23 @@ const TIMEFRAME_CONFIG = {
   '1Y': { points: 52, stepsPerYear: 52 },
   '5Y': { points: 60, stepsPerYear: 12 }
 };
+// Real DR01s haven't all been trading forever -- Bualuang's DR lineup was built up in waves since
+// SET's first-ever DR (Nov 2018), with most single-name US/HK/China tickers only added in 2025-2026
+// batches. A DR obviously can't have real price history from before it was listed, so a requested
+// timeframe whose lookback window reaches further back than a ticker's listedDate simply has no
+// data to show -- the UI shows an empty state instead of fabricating history. `now` is injectable
+// for tests; defaults to the real clock.
+function timeframeYearsBack(timeframe){
+  const cfg = TIMEFRAME_CONFIG[timeframe] || TIMEFRAME_CONFIG['1M'];
+  return cfg.points / cfg.stepsPerYear;
+}
+function isTimeframeAvailable(u, timeframe, now){
+  if (!u || !u.listedDate) return true;
+  const nowMs = (now instanceof Date ? now : new Date()).getTime();
+  const windowStartMs = nowMs - timeframeYearsBack(timeframe) * 365.25 * 24 * 60 * 60 * 1000;
+  const listedMs = new Date(u.listedDate + 'T00:00:00Z').getTime();
+  return windowStartMs >= listedMs;
+}
 function genPriceSeries(u, timeframe){
   const cfg = TIMEFRAME_CONFIG[timeframe] || TIMEFRAME_CONFIG['1M'];
   const nav = navPriceTHB(u);
@@ -3205,6 +3307,7 @@ const state = {
   wrappedView: 'actual',
   wrappedPeriod: 'monthly',
   wrappedColorway: 'navy',
+  wrappedTestPersonaKey: null,
   selectedIndexKey: null,
   selectedIndexTimeframe: '1D'
 };
@@ -3266,6 +3369,7 @@ function wireOnboarding(){
     markOnboardingSeen();
     $('#onboardingOverlay').classList.add('hidden');
   };
+  if ($('#obDarkModeToggle')) $('#obDarkModeToggle').onclick = (e)=>{ e.stopPropagation(); setDarkMode(!state.darkMode); };
 }
 function maybeShowOnboarding(){
   if (hasSeenOnboarding()){
@@ -3476,9 +3580,12 @@ function wireMessagesOverlay(){
 function setDarkMode(on){
   state.darkMode = on;
   document.body.classList.toggle('dark', on);
-  const toggle = $('#darkModeToggle');
-  toggle.classList.toggle('on', on);
-  toggle.setAttribute('aria-checked', String(on));
+  // Two toggles exist in the DOM (Settings + the onboarding splash), so update every .dark-toggle
+  // rather than a single #darkModeToggle -- keeps both switches in sync regardless of which one fired.
+  $all('.dark-toggle').forEach(toggle=>{
+    toggle.classList.toggle('on', on);
+    toggle.setAttribute('aria-checked', String(on));
+  });
   const meta = document.getElementById('metaThemeColor');
   if (meta) meta.setAttribute('content', on ? '#121212' : '#F5F7F9');
 }
@@ -3616,6 +3723,13 @@ function renderMarketsPagination(totalPages){
 /* MARKET DETAIL OVERLAY                                             */
 /* ---------------------------------------------------------------- */
 const TIMEFRAMES = ['1D','1W','1M','6M','1Y','5Y'];
+// Formats a DR's listedDate ("YYYY-MM-DD") for the "no price history" empty state, in whichever
+// language is currently active.
+function fmtListedDate(dateStr){
+  if (!dateStr) return '';
+  const d = new Date(dateStr + 'T00:00:00Z');
+  return d.toLocaleDateString(LANG==='th'?'th-TH':'en-US', { day:'numeric', month:'short', year:'numeric', timeZone:'UTC' });
+}
 function openMarketDetail(symbol){
   state.selectedMarketSymbol = symbol;
   state.selectedTimeframe = '1D';
@@ -3633,11 +3747,6 @@ function renderMarketDetail(){
   $('#mdName').innerHTML = u.underlyingName + '<span class="mkd-tag '+(u.live?'live':'demo')+'">'+(u.live?T('mkLiveTag'):T('mkDemoTag'))+'</span>';
   $('#mdPrice').textContent = fmtBahtPrice(nav);
 
-  const series = genPriceSeries(u, state.selectedTimeframe);
-  const posNeg = series.changePct >= 0 ? 'pos' : 'neg';
-  $('#mdChg').className = 'mkd-chg '+posNeg;
-  $('#mdChg').textContent = fmtPct(series.changePct) + ' (' + state.selectedTimeframe + ')';
-
   const tfWrap = $('#mdTfStrip'); tfWrap.innerHTML = '';
   TIMEFRAMES.forEach(tf=>{
     const b = document.createElement('button');
@@ -3647,19 +3756,34 @@ function renderMarketDetail(){
     tfWrap.appendChild(b);
   });
 
-  const mdLineColor = series.changePct>=0 ? '#1F8A4D' : '#C8232A';
-  const labels = series.prices.map(()=>'');
-  if (charts.mdChart) charts.mdChart.destroy();
-  charts.mdChart = new Chart($('#mdChart').getContext('2d'), {
-    type:'line',
-    data:{ labels, datasets:[{ data: series.prices.map(p=>Math.round(p*100)/100),
-      borderColor: mdLineColor,
-      backgroundColor: series.changePct>=0 ? 'rgba(31,138,77,0.08)' : 'rgba(200,35,42,0.08)',
-      fill:true, pointRadius:0, borderWidth:2, tension:0.15, ...chartHoverPointStyle(mdLineColor) }] },
-    options:{ maintainAspectRatio:false, interaction:chartInteractionOptions(),
-      scales:{ x:{ display:false }, y:{ ticks:{ color:chartTextColor(), callback:(v)=>fmtBaht(v) }, grid:{ color:chartGridColor() } } },
-      plugins:{ legend:{ display:false }, tooltip:chartTooltipOptions(fmtBahtPrice) } }
-  });
+  const available = isTimeframeAvailable(u, state.selectedTimeframe);
+  if (!available){
+    if (charts.mdChart){ charts.mdChart.destroy(); charts.mdChart = null; }
+    $('#mdChartNoData').classList.add('show');
+    $('#mdChartNoDataSub').textContent = T('chartNoDataSubTemplate').replace('{symbol}', u.symbol).replace('{date}', fmtListedDate(u.listedDate));
+    $('#mdChg').className = 'mkd-chg';
+    $('#mdChg').textContent = T('notListedYetLabel');
+  } else {
+    $('#mdChartNoData').classList.remove('show');
+    const series = genPriceSeries(u, state.selectedTimeframe);
+    const posNeg = series.changePct >= 0 ? 'pos' : 'neg';
+    $('#mdChg').className = 'mkd-chg '+posNeg;
+    $('#mdChg').textContent = fmtPct(series.changePct) + ' (' + state.selectedTimeframe + ')';
+
+    const mdLineColor = series.changePct>=0 ? '#1F8A4D' : '#C8232A';
+    const labels = series.prices.map(()=>'');
+    if (charts.mdChart) charts.mdChart.destroy();
+    charts.mdChart = new Chart($('#mdChart').getContext('2d'), {
+      type:'line',
+      data:{ labels, datasets:[{ data: series.prices.map(p=>Math.round(p*100)/100),
+        borderColor: mdLineColor,
+        backgroundColor: series.changePct>=0 ? 'rgba(31,138,77,0.08)' : 'rgba(200,35,42,0.08)',
+        fill:true, pointRadius:0, borderWidth:2, tension:0.15, ...chartHoverPointStyle(mdLineColor) }] },
+      options:{ maintainAspectRatio:false, interaction:chartInteractionOptions(),
+        scales:{ x:{ display:false }, y:{ ticks:{ color:chartTextColor(), callback:(v)=>fmtBaht(v) }, grid:{ color:chartGridColor() } } },
+        plugins:{ legend:{ display:false }, tooltip:chartTooltipOptions(fmtBahtPrice) } }
+    });
+  }
 
   const rows = [
     [T('mkFieldUnderlying'), u.underlyingSymbol+' · '+u.underlyingName],
@@ -3765,6 +3889,14 @@ function renderBsChart(){
     b.onclick = ()=>{ state.bs.timeframe = tf; renderBsChart(); };
     tfWrap.appendChild(b);
   });
+  const available = isTimeframeAvailable(u, state.bs.timeframe);
+  if (!available){
+    if (charts.bsChart){ charts.bsChart.destroy(); charts.bsChart = null; }
+    $('#bsChartNoData').classList.add('show');
+    $('#bsChartNoDataSub').textContent = T('chartNoDataSubTemplate').replace('{symbol}', u.symbol).replace('{date}', fmtListedDate(u.listedDate));
+    return;
+  }
+  $('#bsChartNoData').classList.remove('show');
   const series = genPriceSeries(u, state.bs.timeframe);
   const bsLineColor = series.changePct>=0 ? '#1F8A4D' : '#C8232A';
   const labels = series.prices.map(()=>'');
@@ -4992,6 +5124,72 @@ function computeWrappedPersona(view, rows, totalValue, totalPnL){
   if (match) return { key:match.key, icon:match.icon, name:T(match.name), body:T(match.body) };
   return { key:'balanced', icon:'assets/mascots/mascot_persona_balanced.png', name:T('wrappedPersonaBalancedName'), body:T('wrappedPersonaBalancedBody') };
 }
+/* ---- Wrapped persona TEST/PREVIEW mode -- lets someone in Settings pick any of the 16
+   possible personas and see the full Wrapped page rendered with made-up holdings/P&L, without
+   needing to build a real portfolio that happens to satisfy that persona's actual trigger
+   conditions. Purely a demo/QA tool -- never touches state.actualHoldings/simulatedPortfolio. ---- */
+const WRAPPED_TEST_PERSONAS = [
+  { key:'allin',      icon:'assets/mascots/mascot_persona_allin.png',      name:'wrappedPersonaAllinName',      body:'wrappedPersonaAllinBody' },
+  { key:'dca',        icon:'assets/mascots/mascot_persona_dca.png',        name:'wrappedPersonaDcaName',        body:'wrappedPersonaDcaBody' },
+  { key:'space',      icon:'assets/mascots/mascot_persona_space.png',      name:'wrappedPersonaSpaceName',      body:'wrappedPersonaSpaceBody' },
+  { key:'crypto',     icon:'assets/mascots/mascot_persona_crypto.png',     name:'wrappedPersonaCryptoName',     body:'wrappedPersonaCryptoBody' },
+  { key:'aipioneer',  icon:'assets/mascots/mascot_persona_ai.png',         name:'wrappedPersonaAiName',         body:'wrappedPersonaAiBody' },
+  { key:'chips',      icon:'assets/mascots/mascot_persona_chips.png',      name:'wrappedPersonaChipsName',      body:'wrappedPersonaChipsBody' },
+  { key:'china',      icon:'assets/mascots/mascot_persona_china.png',      name:'wrappedPersonaChinaName',      body:'wrappedPersonaChinaBody' },
+  { key:'health',     icon:'assets/mascots/mascot_persona_health.png',     name:'wrappedPersonaHealthName',     body:'wrappedPersonaHealthBody' },
+  { key:'luxury',     icon:'assets/mascots/mascot_persona_luxury.png',     name:'wrappedPersonaLuxuryName',     body:'wrappedPersonaLuxuryBody' },
+  { key:'income',     icon:'assets/mascots/mascot_persona_income.png',     name:'wrappedPersonaIncomeName',     body:'wrappedPersonaIncomeBody' },
+  { key:'bluechip',   icon:'assets/mascots/mascot_persona_bluechip.png',   name:'wrappedPersonaBluechipName',   body:'wrappedPersonaBluechipBody' },
+  { key:'index',      icon:'assets/mascots/mascot_persona_index.png',      name:'wrappedPersonaIndexName',      body:'wrappedPersonaIndexBody' },
+  { key:'highroller', icon:'assets/mascots/mascot_persona_highroller.png', name:'wrappedPersonaHighrollerName', body:'wrappedPersonaHighrollerBody' },
+  { key:'diamond',    icon:'assets/mascots/mascot_persona_diamond.png',    name:'wrappedPersonaDiamondName',    body:'wrappedPersonaDiamondBody' },
+  { key:'seed',       icon:'assets/mascots/mascot_persona_seed.png',       name:'wrappedPersonaSeedName',       body:'wrappedPersonaSeedBody' },
+  { key:'balanced',   icon:'assets/mascots/mascot_persona_balanced.png',   name:'wrappedPersonaBalancedName',   body:'wrappedPersonaBalancedBody' }
+];
+// Which real buckets best represent each themed persona, so the made-up holdings look plausible
+// (e.g. the "crypto" persona shows Digital Assets DRs, not a random grab-bag).
+const WRAPPED_TEST_PERSONA_BUCKETS = {
+  space: ['space_economy'], crypto: ['digital_assets'], aipioneer: ['ai_infrastructure'],
+  chips: ['semiconductors','semi_equipment'], china: ['china_internet','china_ev_battery'],
+  health: ['healthcare_medtech'], luxury: ['consumer_luxury'], income: ['fixed_income'],
+  bluechip: ['mega_cap_tech'], index: ['index_broad']
+};
+function pickWrappedTestSymbols(personaKey, count, rng){
+  const buckets = WRAPPED_TEST_PERSONA_BUCKETS[personaKey];
+  let pool = buckets ? buckets.reduce((arr,b)=> arr.concat(UNIVERSE_BY_BUCKET[b]||[]), []) : [];
+  if (pool.length===0) pool = UNIVERSE.slice().sort(()=>rng()-0.5);
+  const seen = new Set(); const uniq = [];
+  pool.forEach(u=>{ if (!seen.has(u.symbol)){ seen.add(u.symbol); uniq.push(u); } });
+  return uniq.slice(0, count);
+}
+function buildWrappedTestData(personaKey){
+  const rng = mulberry32(hashStr('wrappedtest-'+personaKey));
+  let rows = [];
+  if (personaKey==='allin'){
+    const [dom, minor] = pickWrappedTestSymbols(null, 2, rng);
+    rows = [
+      { symbol:dom.symbol, underlyingName:dom.underlyingName, bucket:dom.bucket, mu:dom.mu, sigma:dom.sigma, valueTHB:850000, pnlTHB:120000 },
+      { symbol:minor.symbol, underlyingName:minor.underlyingName, bucket:minor.bucket, mu:minor.mu, sigma:minor.sigma, valueTHB:45000, pnlTHB:-2000 }
+    ];
+  } else if (personaKey==='seed'){
+    const u = UNIVERSE[Math.floor(rng()*UNIVERSE.length)];
+    rows = [{ symbol:u.symbol, underlyingName:u.underlyingName, bucket:u.bucket, mu:u.mu, sigma:u.sigma, valueTHB:3200, pnlTHB:180 }];
+  } else if (personaKey==='diamond'){
+    const syms = pickWrappedTestSymbols(null, 3, rng);
+    rows = syms.map((u,i)=>({ symbol:u.symbol, underlyingName:u.underlyingName, bucket:u.bucket, mu:u.mu, sigma:u.sigma, valueTHB:60000-i*8000, pnlTHB:-(9000+i*3000) }));
+  } else if (personaKey==='highroller'){
+    const syms = pickWrappedTestSymbols(null, 3, rng);
+    rows = syms.map((u,i)=>({ symbol:u.symbol, underlyingName:u.underlyingName, bucket:u.bucket, mu:u.mu, sigma:u.sigma, valueTHB:180000-i*30000, pnlTHB:32000-i*4000 }));
+  } else if (personaKey==='dca' || personaKey==='balanced' || personaKey==='income' || personaKey==='bluechip' || personaKey==='index'){
+    const syms = pickWrappedTestSymbols(personaKey, 5, rng);
+    rows = syms.map((u,i)=>({ symbol:u.symbol, underlyingName:u.underlyingName, bucket:u.bucket, mu:u.mu, sigma:u.sigma, valueTHB:90000-i*9000, pnlTHB:6000-i*900 }));
+  } else {
+    // themed personas: space, crypto, aipioneer, chips, china, health, luxury
+    const syms = pickWrappedTestSymbols(personaKey, 4, rng);
+    rows = syms.map((u,i)=>({ symbol:u.symbol, underlyingName:u.underlyingName, bucket:u.bucket, mu:u.mu, sigma:u.sigma, valueTHB:120000-i*20000, pnlTHB:15000-i*3000 }));
+  }
+  return rows.filter(r=>r.symbol);
+}
 function computeWrappedGoldenDay(rows){
   if (rows.length===0) return null;
   const top = rows.slice().sort((a,b)=>b.valueTHB-a.valueTHB)[0];
@@ -5024,15 +5222,26 @@ function renderWealthWrapped(){
   }, 900);
 }
 function renderWealthWrappedNow(){
-  const view = state.wrappedView;
-  $all('#wrappedPortToggle button').forEach(b=> b.classList.toggle('active', b.dataset.view===view));
-  $all('#wrappedPeriodToggle button').forEach(b=> b.classList.toggle('active', b.dataset.period===state.wrappedPeriod));
+  const isTest = !!state.wrappedTestPersonaKey;
+  if ($('#wrappedRealControls')) $('#wrappedRealControls').style.display = isTest ? 'none' : '';
+  if ($('#wrappedTestBanner')) $('#wrappedTestBanner').style.display = isTest ? 'block' : 'none';
 
-  const rows = getWrappedHoldingsRows(view);
+  let rows, persona, view;
+  if (isTest){
+    const def = WRAPPED_TEST_PERSONAS.find(p=>p.key===state.wrappedTestPersonaKey) || WRAPPED_TEST_PERSONAS[0];
+    rows = buildWrappedTestData(def.key);
+    persona = { key:def.key, icon:def.icon, name:T(def.name), body:T(def.body) };
+    if ($('#wrappedTestPersonaLabel')) $('#wrappedTestPersonaLabel').textContent = persona.name;
+  } else {
+    view = state.wrappedView;
+    $all('#wrappedPortToggle button').forEach(b=> b.classList.toggle('active', b.dataset.view===view));
+    $all('#wrappedPeriodToggle button').forEach(b=> b.classList.toggle('active', b.dataset.period===state.wrappedPeriod));
+    rows = getWrappedHoldingsRows(view);
+  }
   const totalValue = rows.reduce((s,r)=>s+r.valueTHB,0);
   const totalPnL = rows.reduce((s,r)=>s+(r.pnlTHB||0),0);
 
-  const empty = totalValue<=0 || rows.length===0;
+  const empty = !isTest && (totalValue<=0 || rows.length===0);
   $('#wrappedEmpty').style.display = empty ? 'block' : 'none';
   $('#wrappedContent').style.display = empty ? 'none' : 'block';
   if (empty) return;
@@ -5040,7 +5249,7 @@ function renderWealthWrappedNow(){
   applyWrappedHeroBackground();
   renderWrappedColorPicker();
 
-  const persona = computeWrappedPersona(view, rows, totalValue, totalPnL);
+  if (!isTest) persona = computeWrappedPersona(view, rows, totalValue, totalPnL);
   $('#wrappedPersonaIcon').src = persona.icon;
   $('#wrappedPersonaName').textContent = persona.name;
   $('#wrappedPersonaBody').textContent = persona.body;
@@ -5060,7 +5269,9 @@ function renderWealthWrappedNow(){
     ? T('wrappedGoldenBodyTemplate').replace('{symbol}', golden.symbol).replace('{pct}', fmtPctPlain(Math.abs(golden.ret)))
     : T('wrappedGoldenBodyEmpty');
 
-  const statsHoldings = getOptimizeInputHoldings(view) || [];
+  const statsHoldings = isTest
+    ? rows.map(r=>({ bucket:r.bucket, mu:r.mu, sigma:r.sigma, weight: totalValue>0 ? r.valueTHB/totalValue : 0 }))
+    : (getOptimizeInputHoldings(view) || []);
   const portReturn = statsHoldings.length>0 ? portfolioStats(statsHoldings).ret : 0;
   const marketAvgReturn = BUCKET_KEYS.reduce((s,k)=>s+BUCKETS[k].cagr,0) / BUCKET_KEYS.length;
   const diff = portReturn - marketAvgReturn;
@@ -5159,16 +5370,54 @@ function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight){
   lines.slice(0,4).forEach((l,i)=> ctx.fillText(l, x, y + i*lineHeight));
 }
 function openWealthWrapped(){
+  state.wrappedTestPersonaKey = null;
   state.wrappedView = (state.portfolioViewMode==='simulated' && state.simulatedPortfolio) ? 'simulated' : 'actual';
   state.wrappedPeriod = 'monthly';
   renderWealthWrapped();
   openOverlay('overlay-wrapped');
 }
 function openWealthWrappedFor(view){
+  state.wrappedTestPersonaKey = null;
   state.wrappedView = view;
   state.wrappedPeriod = 'monthly';
   renderWealthWrapped();
   openOverlay('overlay-wrapped');
+}
+function openWealthWrappedTest(key){
+  state.wrappedTestPersonaKey = key;
+  renderWealthWrapped();
+  openOverlay('overlay-wrapped');
+}
+function exitWrappedTestMode(){
+  state.wrappedTestPersonaKey = null;
+  renderWealthWrapped();
+}
+function cycleWrappedTestPersona(dir){
+  const idx = WRAPPED_TEST_PERSONAS.findIndex(p=>p.key===state.wrappedTestPersonaKey);
+  const n = WRAPPED_TEST_PERSONAS.length;
+  const nextIdx = ((idx + dir) % n + n) % n;
+  state.wrappedTestPersonaKey = WRAPPED_TEST_PERSONAS[nextIdx].key;
+  renderWealthWrappedNow(); // skip the loading spinner so browsing all 16 personas is snappy
+}
+function renderWrappedTestPicker(){
+  const wrap = $('#wrappedTestGrid');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  WRAPPED_TEST_PERSONAS.forEach(p=>{
+    const el = document.createElement('button');
+    el.type = 'button';
+    el.className = 'wtg-card';
+    el.innerHTML = '<img src="'+p.icon+'" alt="" /><span>'+T(p.name)+'</span>';
+    el.onclick = ()=>{ closeOverlay('overlay-wrapped-test-picker'); openWealthWrappedTest(p.key); };
+    wrap.appendChild(el);
+  });
+}
+function wireWrappedTestPicker(){
+  if ($('#moreWrappedTest')) $('#moreWrappedTest').onclick = ()=>{ renderWrappedTestPicker(); openOverlay('overlay-wrapped-test-picker'); };
+  if ($('#btnCloseWrappedTestPicker')) $('#btnCloseWrappedTestPicker').onclick = ()=> closeOverlay('overlay-wrapped-test-picker');
+  if ($('#wrappedTestPrev')) $('#wrappedTestPrev').onclick = ()=> cycleWrappedTestPersona(-1);
+  if ($('#wrappedTestNext')) $('#wrappedTestNext').onclick = ()=> cycleWrappedTestPersona(1);
+  if ($('#wrappedTestExitBtn')) $('#wrappedTestExitBtn').onclick = ()=> exitWrappedTestMode();
 }
 function wireWealthWrapped(){
   state.wrappedColorway = getStoredWrappedColorway();
@@ -5753,6 +6002,7 @@ function init(){
   wireActivityOverlay();
   wireScheduleOverlay();
   wireWealthWrapped();
+  wireWrappedTestPicker();
   wirePasscodeOverlay();
   wireOrderReceipt();
   wireNewsDetailOverlay();

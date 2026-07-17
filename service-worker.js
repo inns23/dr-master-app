@@ -1,7 +1,7 @@
 // Minimal service worker: caches the app shell so it still opens (with last-seen
 // data) if a friend loses signal, and satisfies Chrome/Android's install criteria.
 // Bump CACHE_NAME any time you push a new version so old caches get cleared out.
-const CACHE_NAME = 'dr-master-shell-v17';
+const CACHE_NAME = 'dr-master-shell-v20';
 const SHELL_FILES = [
   './',
   './index.html',
